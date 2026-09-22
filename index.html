@@ -400,34 +400,53 @@
     // 2. 초기 물건 데이터
     // =======================================================
     const INITIAL_ITEMS = [
-      { id: 1, name: "노트북 & 충전 어댑터", zone: "A-1", slotId: "A-1-top", tags: ["전자기기", "학습", "작업"], desc: "책상 위" },
-      { id: 2, name: "데스크 스탠드 조명", zone: "A-1", slotId: "A-1-top", tags: ["조명", "책상"], desc: "책상 우측 모서리" },
-      { id: 3, name: "안경 및 스마트폰 충전 케이블", zone: "A-2", slotId: "A-2-top", tags: ["안경", "충전기", "수면"], desc: "침대 옆 원형 협탁 상단" },
-      { id: 4, name: "침구류 세트", zone: "A-3", slotId: "A-3-bed", tags: ["침구", "이불"], desc: "침대 위" },
-      { id: 5, name: "두루마리 휴지 & 키친타월", zone: "B-2", slotId: "B-2-5", tags: ["생필품", "청소"], desc: "메탈 선반 5층 (최상단)" },
-      { id: 6, name: "여분 수납함 & 소품 용기", zone: "B-2", slotId: "B-2-4", tags: ["수납", "잡화"], desc: "메탈 선반 4층" },
-      { id: 7, name: "식기류 및 프라이팬, 냄비", zone: "B-2", slotId: "B-2-3", tags: ["주방", "요리", "냄비"], desc: "메탈 선반 3층 조리선반" },
-      { id: 8, name: "화이트 패브릭 수납 박스 2개", zone: "B-2", slotId: "B-2-2", tags: ["수납함", "정리"], desc: "메탈 선반 2층" },
-      { id: 9, name: "택배 박스 및 대형 수납함", zone: "B-2", slotId: "B-2-1", tags: ["박스", "보관"], desc: "메탈 선반 1층 (바닥)" },
-      { id: 10, name: "전자기기 부자재 & 스탠드 용품", zone: "C-1", slotId: "C-1-4", tags: ["전자기기", "케이블"], desc: "원목 책장 4층 (최상단)" },
-      { id: 11, name: "외출용 가방 & 파우치", zone: "C-1", slotId: "C-1-3", tags: ["가방", "외출"], desc: "원목 책장 3층" },
-      { id: 12, name: "전공 서적 및 강의 노트", zone: "C-1", slotId: "C-1-2", tags: ["책", "물리", "공부"], desc: "원목 책장 2층" },
-      { id: 13, name: "서류철 & 케이블 정리함", zone: "C-1", slotId: "C-1-1", tags: ["서류", "정리함"], desc: "원목 책장 1층 (하단)" },
-      { id: 14, name: "계절 지난 옷 & 여분 짐", zone: "C-2", slotId: "C-2-carrier", tags: ["캐리어", "보관"], desc: "구석 대형 캐리어 안" },
-      { id: 15, name: "외투 및 겨울 패딩, 후드집업", zone: "D-1", slotId: "D-1-hanger", tags: ["옷", "패딩", "행거"], desc: "옷장 좌측 메인 행거" },
-      { id: 16, name: "계절 모자 및 가방", zone: "D-1", slotId: "D-1-top", tags: ["모자", "가방"], desc: "옷장 좌측 상단 선반" },
-      { id: 17, name: "접은 의류 및 보관 비닐팩", zone: "D-1", slotId: "D-1-shelf1", tags: ["의류", "보관"], desc: "옷장 좌측 하단 선반 1단" },
-      { id: 18, name: "개어둔 티셔츠 & 청바지", zone: "D-2", slotId: "D-2-T1-b1", tags: ["의류", "청바지"], desc: "우측장 1열 와이어 바구니 1호" },
-      { id: 19, name: "양말 및 속옷, 이너웨어", zone: "D-2", slotId: "D-2-T1-b2", tags: ["의류", "속옷", "양말"], desc: "우측장 1열 와이어 바구니 2호" },
-      { id: 20, name: "세탁 바구니 & 잡화", zone: "D-2", slotId: "D-2-T1-bot", tags: ["세탁", "바구니"], desc: "우측장 1열 하단 바구니" },
-      { id: 21, name: "쇼핑백 & 보관 짐", zone: "D-2", slotId: "D-2-T2-bot", tags: ["쇼핑백", "짐"], desc: "우측장 2열 바닥 공간" },
-      { id: 22, name: "여분 세면도구 & 샴푸 리필", zone: "E-1", slotId: "E-1-mirror-top", tags: ["욕실", "샴푸"], desc: "거울 수납장 1단 (상단)" },
-      { id: 23, name: "스킨, 로션, 선크림", zone: "E-1", slotId: "E-1-mirror-mid", tags: ["화장품", "스킨케어"], desc: "거울 수납장 2단 (중단)" },
-      { id: 24, name: "칫솔, 치약, 면도기", zone: "E-1", slotId: "E-1-mirror-bot", tags: ["욕실", "세면도구", "위생"], desc: "거울 수납장 3단 (하단)" },
-      { id: 25, name: "핸드워시 & 비누", zone: "E-1", slotId: "E-1-sink", tags: ["세면대", "핸드워시"], desc: "세면대 주변 트레이" }
+      // A-1 책상 (18개 실제 정리 물품)
+      { id: 1, name: "노트북 (LG 그램 화이트)", zone: "A-1", slotId: "A-1-top", tags: ["전자기기", "노트북", "책상"], desc: "책상 중앙 상판" },
+      { id: 2, name: "태블릿 및 스타일러스 펜", zone: "A-1", slotId: "A-1-top", tags: ["전자기기", "태블릿", "책상"], desc: "노트북 앞 좌측" },
+      { id: 3, name: "무선 마우스 및 마우스패드", zone: "A-1", slotId: "A-1-top", tags: ["전자기기", "주변기기", "마우스"], desc: "노트북 우측 앞" },
+      { id: 4, name: "데스크 스탠드 조명", zone: "A-1", slotId: "A-1-top", tags: ["조명", "책상"], desc: "책상 우측 상단 고정식 관절 스탠드" },
+      { id: 5, name: "보조배터리 (노란색 잔량표시형 & 화이트)", zone: "A-1", slotId: "A-1-top", tags: ["전자기기", "충전", "보조배터리"], desc: "스탠드 하단 우측" },
+      { id: 6, name: "태블릿 거치대 (패브릭 파우치 보관)", zone: "A-1", slotId: "A-1-top", tags: ["거치대", "액세서리", "태블릿"], desc: "마우스패드 우측 조임끈이 있는 긴 천 파우치" },
+      { id: 7, name: "스탠드형 파일 꽂이 (블랙)", zone: "A-1", slotId: "A-1-top", tags: ["수납", "문구", "오거나이저"], desc: "책상 좌측 상단 모서리" },
+      { id: 8, name: "태블릿 파우치 & 노트북 파우치", zone: "A-1", slotId: "A-1-top", tags: ["파우치", "가방", "전자기기"], desc: "책상 좌측 블랙 파일 꽂이 내부" },
+      { id: 9, name: "L자 파일 및 중요 문서", zone: "A-1", slotId: "A-1-top", tags: ["서류", "문서", "보안"], desc: "책상 좌측 블랙 파일 꽂이 내부 L자 파일 안" },
+      { id: 10, name: "기타 홍보물 (지퍼백 보관)", zone: "A-1", slotId: "A-1-top", tags: ["서류", "홍보물", "잡화"], desc: "책상 좌측 블랙 파일 꽂이 내부 지퍼백" },
+      { id: 11, name: "영수증 분리 트레이 (펄프 몰드/계란판 트레이)", zone: "A-1", slotId: "A-1-top", tags: ["수납", "영수증", "가계부"], desc: "파일 꽂이 앞 좌측 트레이" },
+      { id: 12, name: "가계부 반영 완료 영수증 (지퍼백)", zone: "A-1", slotId: "A-1-top", tags: ["영수증", "지퍼백", "정리완료"], desc: "계란판 트레이 위 지퍼백 내부" },
+      { id: 13, name: "가계부 미반영 영수증", zone: "A-1", slotId: "A-1-top", tags: ["영수증", "정리대기"], desc: "계란판 트레이 위 낱장 (지퍼백 밖)" },
+      { id: 14, name: "이어폰 거치 트레이 (회색 플라스틱 트레이)", zone: "A-1", slotId: "A-1-top", tags: ["수납", "트레이", "이어폰"], desc: "파일 꽂이 우측 이어폰 보관용 회색 트레이" },
+      { id: 15, name: "안경닦이 보관용기 (회색 햇반 그릇)", zone: "A-1", slotId: "A-1-top", tags: ["소품", "안경닦이", "트레이"], desc: "스탠드 좌측 원형 플라스틱 용기" },
+      { id: 16, name: "텀블러 및 코스터", zone: "A-1", slotId: "A-1-top", tags: ["주방", "음료", "텀블러"], desc: "모니터 우측 뒤편 스탠드 사이" },
+      { id: 17, name: "쓰레기 배출용 종이봉투", zone: "A-1", slotId: "A-1-top", tags: ["청소", "봉투", "쓰레기"], desc: "책상 좌측 프레임/다리 걸이" },
+      { id: 18, name: "가방 수납함 (배낭, 크로스백)", zone: "A-1", slotId: "A-1-top", tags: ["가방", "배낭", "크로스백", "수납"], desc: "책상 하단 우측 블랙 수납함 내부" },
+
+      // 기타 구역 기본 데이터
+      { id: 19, name: "안경 및 스마트폰 충전 케이블", zone: "A-2", slotId: "A-2-top", tags: ["안경", "충전기", "수면"], desc: "침대 옆 원형 협탁 상단" },
+      { id: 20, name: "침구류 세트", zone: "A-3", slotId: "A-3-bed", tags: ["침구", "이불"], desc: "침대 위" },
+      { id: 21, name: "두루마리 휴지 & 키친타월", zone: "B-2", slotId: "B-2-5", tags: ["생필품", "청소"], desc: "메탈 선반 5층 (최상단)" },
+      { id: 22, name: "여분 수납함 & 소품 용기", zone: "B-2", slotId: "B-2-4", tags: ["수납", "잡화"], desc: "메탈 선반 4층" },
+      { id: 23, name: "식기류 및 프라이팬, 냄비", zone: "B-2", slotId: "B-2-3", tags: ["주방", "요리", "냄비"], desc: "메탈 선반 3층 조리선반" },
+      { id: 24, name: "화이트 패브릭 수납 박스 2개", zone: "B-2", slotId: "B-2-2", tags: ["수납함", "정리"], desc: "메탈 선반 2층" },
+      { id: 25, name: "택배 박스 및 대형 수납함", zone: "B-2", slotId: "B-2-1", tags: ["박스", "보관"], desc: "메탈 선반 1층 (바닥)" },
+      { id: 26, name: "전자기기 부자재 & 스탠드 용품", zone: "C-1", slotId: "C-1-4", tags: ["전자기기", "케이블"], desc: "원목 책장 4층 (최상단)" },
+      { id: 27, name: "외출용 가방 & 파우치", zone: "C-1", slotId: "C-1-3", tags: ["가방", "외출"], desc: "원목 책장 3층" },
+      { id: 28, name: "전공 서적 및 강의 노트", zone: "C-1", slotId: "C-1-2", tags: ["책", "물리", "공부"], desc: "원목 책장 2층" },
+      { id: 29, name: "서류철 & 케이블 정리함", zone: "C-1", slotId: "C-1-1", tags: ["서류", "정리함"], desc: "원목 책장 1층 (하단)" },
+      { id: 30, name: "계절 지난 옷 & 여분 짐", zone: "C-2", slotId: "C-2-carrier", tags: ["캐리어", "보관"], desc: "구석 대형 캐리어 안" },
+      { id: 31, name: "외투 및 겨울 패딩, 후드집업", zone: "D-1", slotId: "D-1-hanger", tags: ["옷", "패딩", "행거"], desc: "옷장 좌측 메인 행거" },
+      { id: 32, name: "계절 모자 및 가방", zone: "D-1", slotId: "D-1-top", tags: ["모자", "가방"], desc: "옷장 좌측 상단 선반" },
+      { id: 33, name: "접은 의류 및 보관 비닐팩", zone: "D-1", slotId: "D-1-shelf1", tags: ["의류", "보관"], desc: "옷장 좌측 하단 선반 1단" },
+      { id: 34, name: "개어둔 티셔츠 & 청바지", zone: "D-2", slotId: "D-2-T1-b1", tags: ["의류", "청바지"], desc: "우측장 1열 와이어 바구니 1호" },
+      { id: 35, name: "양말 및 속옷, 이너웨어", zone: "D-2", slotId: "D-2-T1-b2", tags: ["의류", "속옷", "양말"], desc: "우측장 1열 와이어 바구니 2호" },
+      { id: 36, name: "세탁 바구니 & 잡화", zone: "D-2", slotId: "D-2-T1-bot", tags: ["세탁", "바구니"], desc: "우측장 1열 하단 바구니" },
+      { id: 37, name: "쇼핑백 & 보관 짐", zone: "D-2", slotId: "D-2-T2-bot", tags: ["쇼핑백", "짐"], desc: "우측장 2열 바닥 공간" },
+      { id: 38, name: "여분 세면도구 & 샴푸 리필", zone: "E-1", slotId: "E-1-mirror-top", tags: ["욕실", "샴푸"], desc: "거울 수납장 1단 (상단)" },
+      { id: 39, name: "스킨, 로션, 선크림", zone: "E-1", slotId: "E-1-mirror-mid", tags: ["화장품", "스킨케어"], desc: "거울 수납장 2단 (중단)" },
+      { id: 40, name: "칫솔, 치약, 면도기", zone: "E-1", slotId: "E-1-mirror-bot", tags: ["욕실", "세면도구", "위생"], desc: "거울 수납장 3단 (하단)" },
+      { id: 41, name: "핸드워시 & 비누", zone: "E-1", slotId: "E-1-sink", tags: ["세면대", "핸드워시"], desc: "세면대 주변 트레이" }
     ];
 
-    const STORAGE_KEY = 'room_inventory_items_v4_perfect';
+    const STORAGE_KEY = 'room_inventory_items_v5_a1_updated';
 
     function loadItems() {
       try {
@@ -435,6 +454,19 @@
         if (stored) {
           const parsed = JSON.parse(stored);
           if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        }
+
+        // 이전 버전 로컬 스토리지 마이그레이션 (기존 다른 구역 데이터 보존 + A-1 신규 18개 반영)
+        const oldStored = localStorage.getItem('room_inventory_items_v4_perfect');
+        if (oldStored) {
+          const parsedOld = JSON.parse(oldStored);
+          if (Array.isArray(parsedOld)) {
+            const nonA1 = parsedOld.filter(i => i.zone !== 'A-1');
+            const a1New = INITIAL_ITEMS.filter(i => i.zone === 'A-1');
+            const merged = [...a1New, ...nonA1];
+            saveItems(merged);
+            return merged;
+          }
         }
       } catch (e) {
         console.warn("로컬 저장소 로드 실패", e);
