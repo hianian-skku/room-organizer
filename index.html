@@ -1,724 +1,472 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>My Room — 물건 위치 관리</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>방 수납 인벤토리 지도</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            surface: { DEFAULT: '#f8fafc', card: '#ffffff', muted: '#f1f5f9' },
-            ink: { DEFAULT: '#0f172a', soft: '#475569', faint: '#94a3b8' },
-            accent: { DEFAULT: '#0ea5e9', hover: '#0284c7', soft: '#e0f2fe' },
-          },
-          fontFamily: { sans: ['"Pretendard"', 'system-ui', 'sans-serif'] },
-        },
-      },
-    };
-  </script>
-  <link rel="preconnect" href="https://cdn.jsdelivr.net" />
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
   <style>
-    @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css');
-    [data-lucide] { width: 1.125rem; height: 1.125rem; stroke-width: 2; }
-    .item-card { transition: transform 0.15s ease, box-shadow 0.15s ease; }
-    .item-card:hover { transform: translateY(-1px); }
-    #toast-container { pointer-events: none; }
-    #toast-container > * { pointer-events: auto; }
-    @keyframes toast-in {
-      from { opacity: 0; transform: translateY(8px); }
-      to { opacity: 1; transform: translateY(0); }
+    body {
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
     }
-    .toast-enter { animation: toast-in 0.25s ease forwards; }
+    .zone-box {
+      transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+      cursor: pointer;
+      position: relative;
+    }
+    .zone-box:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px -2px rgba(37, 99, 235, 0.12), 0 2px 6px -1px rgba(0, 0, 0, 0.06);
+    }
+    .zone-active {
+      border-color: #2563eb !important;
+      background-color: #eff6ff !important;
+      color: #1d4ed8 !important;
+      font-weight: 700;
+      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.25), 0 6px 16px -2px rgba(37, 99, 235, 0.2) !important;
+    }
+    .item-card {
+      transition: all 0.2s ease-in-out;
+      cursor: pointer;
+    }
+    .item-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px -2px rgba(0, 0, 0, 0.08);
+      border-color: #cbd5e1;
+    }
+    @keyframes zone-ping {
+      0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.6); }
+      50% { transform: scale(1.03); box-shadow: 0 0 0 10px rgba(37, 99, 235, 0); }
+      100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(37, 99, 235, 0); }
+    }
+    .zone-highlight {
+      animation: zone-ping 0.8s ease-in-out;
+    }
   </style>
 </head>
-<body class="min-h-screen bg-gradient-to-b from-slate-100 to-sky-50/80 text-ink font-sans antialiased">
-  <div id="app" class="mx-auto max-w-6xl px-4 pb-24 pt-6 sm:px-6 sm:pt-8">
-    <!-- Header -->
-    <header class="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+<body class="bg-slate-50 text-slate-800 p-4 md:p-8 min-h-screen">
+
+  <div class="max-w-4xl mx-auto space-y-6">
+    <!-- 헤더 -->
+    <header class="flex flex-wrap justify-between items-center gap-3 pb-3 border-b border-slate-200">
       <div>
-        <p class="text-xs font-medium uppercase tracking-widest text-sky-600">Local-first</p>
-        <h1 class="mt-1 text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl">My Room</h1>
-        <p class="mt-1 text-sm text-ink-soft">방 청소 · 정리 · 물건 위치를 한곳에서</p>
+        <h1 class="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
+          <span>방 수납 인벤토리</span>
+          <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">Interactive Map</span>
+        </h1>
+        <p class="text-sm text-slate-500 mt-1">방 구조 미니맵이나 물건 카드를 직접 클릭해서 위치를 한눈에 확인하세요.</p>
       </div>
-      <div class="flex flex-wrap gap-2">
-        <button type="button" id="btn-export" class="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50">
-          <i data-lucide="download"></i> 백업
+      <div class="flex items-center gap-2">
+        <button onclick="resetFilter()" class="text-xs bg-slate-200 hover:bg-slate-300 active:scale-95 text-slate-700 px-3 py-2 rounded-xl font-medium transition flex items-center gap-1.5 shadow-sm">
+          <span>🔄 전체 보기</span>
         </button>
-        <label class="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50">
-          <i data-lucide="upload"></i> 복원
-          <input type="file" id="import-file" accept="application/json,.json" class="hidden" />
-        </label>
-        <button type="button" id="btn-add" class="inline-flex items-center gap-2 rounded-xl bg-sky-500 px-4 py-2 text-sm font-semibold text-white shadow-md shadow-sky-500/25 hover:bg-sky-600">
-          <i data-lucide="plus"></i> 물건 추가
+        <button onclick="openAddModal()" class="text-xs bg-blue-600 hover:bg-blue-700 active:scale-95 text-white px-3.5 py-2 rounded-xl font-medium transition flex items-center gap-1.5 shadow-sm shadow-blue-500/20">
+          <span>+ 물건 등록</span>
         </button>
       </div>
     </header>
 
-    <!-- Search -->
-    <div class="relative mb-6">
-      <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
-      <input
-        id="search-input"
-        type="search"
-        placeholder="이름, A-1, 위치, 태그, 메모, 초성 검색… (Ctrl+K)"
-        autocomplete="off"
-        class="w-full rounded-2xl border border-slate-200/80 bg-white py-3.5 pl-11 pr-4 text-sm shadow-sm ring-sky-500/0 placeholder:text-slate-400 focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-500/30"
-      />
-      <kbd class="pointer-events-none absolute right-3 top-1/2 hidden -translate-y-1/2 rounded-lg border border-slate-200 bg-slate-50 px-2 py-0.5 text-[10px] font-medium text-slate-500 sm:inline">⌘K</kbd>
-    </div>
-
-    <!-- Zones -->
-    <section class="mb-8">
-      <div class="mb-3 flex items-center justify-between">
-        <h2 class="text-sm font-semibold text-slate-800">구역</h2>
-        <button type="button" id="btn-clear-zone" class="text-xs font-medium text-sky-600 hover:text-sky-700 hidden">전체 보기</button>
+    <!-- 인터랙티브 방 구조 미니맵 UI -->
+    <section class="bg-white p-5 md:p-6 rounded-2xl shadow-sm border border-slate-200">
+      <div class="flex items-center justify-between mb-3">
+        <div class="flex items-center gap-2">
+          <h2 class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Room Layout Map</h2>
+          <span class="text-[11px] text-slate-400 font-normal">구역 클릭 시 해당 위치 물건만 필터링</span>
+        </div>
+        <span id="active-zone-label" class="text-xs font-medium text-blue-600 bg-blue-50 px-2.5 py-1 rounded-lg border border-blue-100 transition-all">전체 구역 표시 중</span>
       </div>
-      <div id="zone-grid" class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5"></div>
+
+      <!-- 평면도 그리드 -->
+      <div class="grid grid-cols-4 gap-3 text-center text-xs md:text-sm select-none">
+        <!-- 창가 쪽 -->
+        <div class="col-span-4 bg-slate-100 py-1.5 rounded-xl text-slate-400 font-mono text-[11px] border border-dashed border-slate-300">
+          [ 창문 및 라디에이터 영역 ]
+        </div>
+
+        <!-- 1행: 책상 / 선반 / 러기지 -->
+        <div onclick="selectZone('A-1')" id="zone-A-1" class="zone-box col-span-2 bg-slate-50 border border-slate-200 p-4 rounded-xl flex flex-col items-center justify-center">
+          <div class="flex items-center gap-1.5">
+            <span class="font-bold">A-1 책상</span>
+            <span class="zone-count text-[10px] bg-slate-200/80 text-slate-600 px-1.5 py-0.5 rounded-full" data-zone="A-1">0</span>
+          </div>
+          <span class="text-[11px] text-slate-500 mt-0.5">노트북, 스탠드, 필기구</span>
+        </div>
+        <div onclick="selectZone('B-1')" id="zone-B-1" class="zone-box bg-slate-50 border border-slate-200 p-4 rounded-xl flex flex-col items-center justify-center">
+          <div class="flex items-center gap-1.5">
+            <span class="font-bold">B-1 메탈 선반</span>
+            <span class="zone-count text-[10px] bg-slate-200/80 text-slate-600 px-1.5 py-0.5 rounded-full" data-zone="B-1">0</span>
+          </div>
+          <span class="text-[11px] text-slate-500 mt-0.5">식기, 휴지, 박스</span>
+        </div>
+        <div onclick="selectZone('B-2')" id="zone-B-2" class="zone-box bg-slate-50 border border-slate-200 p-4 rounded-xl flex flex-col items-center justify-center">
+          <div class="flex items-center gap-1.5">
+            <span class="font-bold">B-2 원목 책장</span>
+            <span class="zone-count text-[10px] bg-slate-200/80 text-slate-600 px-1.5 py-0.5 rounded-full" data-zone="B-2">0</span>
+          </div>
+          <span class="text-[11px] text-slate-500 mt-0.5">책, 전자기기 부자재</span>
+        </div>
+
+        <!-- 2행: 협탁 / 중앙 공간 / 캐리어 -->
+        <div onclick="selectZone('A-2')" id="zone-A-2" class="zone-box bg-slate-50 border border-slate-200 p-4 rounded-xl flex flex-col items-center justify-center">
+          <div class="flex items-center gap-1.5">
+            <span class="font-bold">A-2 원형 협탁</span>
+            <span class="zone-count text-[10px] bg-slate-200/80 text-slate-600 px-1.5 py-0.5 rounded-full" data-zone="A-2">0</span>
+          </div>
+          <span class="text-[11px] text-slate-500 mt-0.5">안경, 충전기</span>
+        </div>
+        <div class="col-span-2 bg-slate-50/50 border border-dashed border-slate-200 rounded-xl flex items-center justify-center text-slate-300 text-[11px]">
+          중앙 활동 공간 / 의자
+        </div>
+        <div onclick="selectZone('D-1')" id="zone-D-1" class="zone-box bg-slate-50 border border-slate-200 p-4 rounded-xl flex flex-col items-center justify-center">
+          <div class="flex items-center gap-1.5">
+            <span class="font-bold">D-1 구석 캐리어</span>
+            <span class="zone-count text-[10px] bg-slate-200/80 text-slate-600 px-1.5 py-0.5 rounded-full" data-zone="D-1">0</span>
+          </div>
+          <span class="text-[11px] text-slate-500 mt-0.5">장기 보관, 계절옷</span>
+        </div>
+
+        <!-- 3행: 침대 / 옷장 / 욕실 -->
+        <div onclick="selectZone('A-3')" id="zone-A-3" class="zone-box col-span-2 bg-slate-50 border border-slate-200 p-4 rounded-xl flex flex-col items-center justify-center">
+          <div class="flex items-center gap-1.5">
+            <span class="font-bold">A-3 침대 & 하단</span>
+            <span class="zone-count text-[10px] bg-slate-200/80 text-slate-600 px-1.5 py-0.5 rounded-full" data-zone="A-3">0</span>
+          </div>
+          <span class="text-[11px] text-slate-500 mt-0.5">침구, 하단 수납함</span>
+        </div>
+        <div onclick="selectZone('C-1')" id="zone-C-1" class="zone-box bg-slate-50 border border-slate-200 p-4 rounded-xl flex flex-col items-center justify-center">
+          <div class="flex items-center gap-1.5">
+            <span class="font-bold">C-1 붙박이 옷장</span>
+            <span class="zone-count text-[10px] bg-slate-200/80 text-slate-600 px-1.5 py-0.5 rounded-full" data-zone="C-1">0</span>
+          </div>
+          <span class="text-[11px] text-slate-500 mt-0.5">행거 의류, 바구니</span>
+        </div>
+        <div onclick="selectZone('E-1')" id="zone-E-1" class="zone-box bg-slate-50 border border-slate-200 p-4 rounded-xl flex flex-col items-center justify-center">
+          <div class="flex items-center gap-1.5">
+            <span class="font-bold">E-1 욕실 수납함</span>
+            <span class="zone-count text-[10px] bg-slate-200/80 text-slate-600 px-1.5 py-0.5 rounded-full" data-zone="E-1">0</span>
+          </div>
+          <span class="text-[11px] text-slate-500 mt-0.5">세면도구, 칫솔</span>
+        </div>
+      </div>
     </section>
 
-    <!-- Items -->
+    <!-- 검색창 -->
+    <div class="relative">
+      <input type="text" id="search-input" oninput="handleSearch()" placeholder="물건 이름, 태그, 구역 검색 (예: 케이블, 약, A-1)..." 
+             class="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm pl-10">
+      <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm">🔍</span>
+      <button id="clear-search-btn" onclick="clearSearch()" class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-400 hover:text-slate-600 bg-slate-100 hover:bg-slate-200 px-2 py-1 rounded-md transition">
+        지우기
+      </button>
+    </div>
+
+    <!-- 물건 목록 카드 뷰 -->
     <section>
-      <div class="mb-4 flex items-baseline justify-between gap-2">
-        <h2 class="text-sm font-semibold text-slate-800">물건 목록</h2>
-        <p id="result-count" class="text-xs text-ink-faint"></p>
+      <div class="flex justify-between items-center mb-3">
+        <div class="flex items-center gap-2">
+          <h3 class="text-sm font-semibold text-slate-700">보관된 아이템 목록 (<span id="item-count">0</span>)</h3>
+          <span class="text-xs text-slate-400 hidden sm:inline">· 카드를 클릭하면 지도에서 위치가 강조됩니다</span>
+        </div>
       </div>
-      <div id="items-grid" class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3"></div>
-      <div id="empty-state" class="hidden rounded-2xl border border-dashed border-slate-200 bg-white/60 py-16 text-center">
-        <i data-lucide="package-open" class="mx-auto mb-3 h-10 w-10 text-slate-300"></i>
-        <p class="text-sm font-medium text-slate-600">표시할 물건이 없습니다</p>
-        <p class="mt-1 text-xs text-slate-400">검색어를 바꾸거나 새 물건을 추가해 보세요</p>
+      <div id="item-list" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <!-- 자바스크립트로 렌더링 -->
       </div>
     </section>
   </div>
 
-  <!-- Modal -->
-  <div id="modal-backdrop" class="fixed inset-0 z-40 hidden bg-slate-900/40 backdrop-blur-sm" aria-hidden="true"></div>
-  <div id="item-modal" class="fixed inset-x-4 top-[8vh] z-50 mx-auto hidden max-h-[84vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-slate-200 bg-white shadow-2xl sm:inset-x-auto" role="dialog" aria-modal="true" aria-labelledby="modal-title">
-    <form id="item-form" class="p-5 sm:p-6">
-      <div class="mb-5 flex items-start justify-between gap-3">
-        <div>
-          <h3 id="modal-title" class="text-lg font-semibold text-slate-900">물건 추가</h3>
-          <p class="text-xs text-slate-500">구역과 세부 위치를 정확히 적어 두면 찾기 쉬워요</p>
-        </div>
-        <button type="button" id="modal-close" class="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600" aria-label="닫기">
-          <i data-lucide="x"></i>
-        </button>
+  <!-- 물건 등록 모달 -->
+  <div id="add-modal" class="fixed inset-0 z-50 hidden bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-2xl max-w-md w-full p-5 space-y-4">
+      <div class="flex justify-between items-center pb-2 border-b border-slate-100">
+        <h3 class="text-base font-bold text-slate-800">새 물건 등록</h3>
+        <button onclick="closeAddModal()" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg">✕</button>
       </div>
-
-      <div class="space-y-4">
+      <form id="add-form" onsubmit="handleAddItem(event)" class="space-y-3 text-sm">
         <div>
-          <label for="field-name" class="mb-1 block text-xs font-medium text-slate-600">이름 *</label>
-          <input id="field-name" required maxlength="120" class="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-500/25" placeholder="예: 여권, 멀티탭" />
+          <label class="block text-xs font-semibold text-slate-600 mb-1">물건 이름 *</label>
+          <input type="text" id="modal-name" required placeholder="예: 비상약 키트, 충전기" class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500">
         </div>
-
-        <div class="grid grid-cols-2 gap-3">
-          <div>
-            <label for="field-zone" class="mb-1 block text-xs font-medium text-slate-600">구역 *</label>
-            <select id="field-zone" required class="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-500/25"></select>
-          </div>
-          <div>
-            <label for="field-slot" class="mb-1 block text-xs font-medium text-slate-600">세부 위치 *</label>
-            <select id="field-slot" required class="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-500/25"></select>
-          </div>
-        </div>
-
         <div>
-          <label for="field-tags" class="mb-1 block text-xs font-medium text-slate-600">태그 (쉼표 구분)</label>
-          <input id="field-tags" class="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-500/25" placeholder="전자기기, 여행" />
+          <label class="block text-xs font-semibold text-slate-600 mb-1">보관 구역 *</label>
+          <select id="modal-zone" required class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
+            <option value="A-1">A-1 책상 (노트북, 스탠드, 필기구)</option>
+            <option value="A-2">A-2 원형 협탁 (안경, 충전기)</option>
+            <option value="A-3">A-3 침대 & 하단 (침구, 하단 수납함)</option>
+            <option value="B-1">B-1 메탈 선반 (식기, 휴지, 박스)</option>
+            <option value="B-2">B-2 원목 책장 (책, 전자기기 부자재)</option>
+            <option value="C-1">C-1 붙박이 옷장 (행거 의류, 바구니)</option>
+            <option value="D-1">D-1 구석 캐리어 (장기 보관, 계절옷)</option>
+            <option value="E-1">E-1 욕실 수납함 (세면도구, 칫솔)</option>
+          </select>
         </div>
-
         <div>
-          <label for="field-memo" class="mb-1 block text-xs font-medium text-slate-600">메모</label>
-          <textarea id="field-memo" rows="2" class="w-full resize-none rounded-xl border border-slate-200 px-3 py-2.5 text-sm focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-500/25" placeholder="추가 설명"></textarea>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">세부 위치 / 메모</label>
+          <input type="text" id="modal-desc" placeholder="예: 책상 우측 1단 서랍 내부" class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500">
         </div>
-
         <div>
-          <span class="mb-2 block text-xs font-medium text-slate-600">색상 라벨</span>
-          <div id="color-picker" class="flex flex-wrap gap-2"></div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">태그 (쉼표로 구분)</label>
+          <input type="text" id="modal-tags" placeholder="예: 생필품, 건강, 비상" class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500">
         </div>
-      </div>
-
-      <div class="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-        <button type="button" id="btn-delete" class="hidden rounded-xl border border-red-200 px-4 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50 sm:mr-auto">삭제</button>
-        <button type="button" id="modal-cancel" class="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50">취소</button>
-        <button type="submit" class="rounded-xl bg-sky-500 px-5 py-2.5 text-sm font-semibold text-white hover:bg-sky-600">저장</button>
-      </div>
-      <input type="hidden" id="field-id" />
-    </form>
-  </div>
-
-  <!-- Confirm dialog -->
-  <div id="confirm-dialog" class="fixed inset-0 z-[60] hidden items-center justify-center p-4">
-    <div class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm" id="confirm-backdrop"></div>
-    <div class="relative w-full max-w-sm rounded-2xl border border-slate-200 bg-white p-5 shadow-xl">
-      <p id="confirm-message" class="text-sm text-slate-700"></p>
-      <div class="mt-5 flex justify-end gap-2">
-        <button type="button" id="confirm-cancel" class="rounded-xl border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50">취소</button>
-        <button type="button" id="confirm-ok" class="rounded-xl bg-red-500 px-4 py-2 text-sm font-semibold text-white hover:bg-red-600">확인</button>
-      </div>
+        <div class="flex justify-end gap-2 pt-2">
+          <button type="button" onclick="closeAddModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl text-xs font-medium transition">취소</button>
+          <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-medium transition shadow-sm">등록하기</button>
+        </div>
+      </form>
     </div>
   </div>
 
-  <div id="toast-container" class="fixed bottom-4 right-4 z-[70] flex max-w-sm flex-col gap-2"></div>
-
-  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
   <script>
-    const STORAGE_KEY = 'myroom-items-v1';
-
-    const ZONES = {
-      A: {
-        id: 'A',
-        title: '책상 & 작업대',
-        subtitle: '서랍 · 상판',
-        icon: 'monitor',
-        slots: [
-          { code: 'A-1', label: '서랍 1단' },
-          { code: 'A-2', label: '서랍 2단' },
-          { code: 'A-3', label: '서랍 3단' },
-          { code: 'A-T', label: '상판 정리함' },
-        ],
-      },
-      B: {
-        id: 'B',
-        title: '옷장 & 행거',
-        subtitle: '상단 · 슬라이딩',
-        icon: 'shirt',
-        slots: [
-          { code: 'B-T', label: '상단 수납박스' },
-          { code: 'B-S', label: '슬라이딩 서랍' },
-        ],
-      },
-      C: {
-        id: 'C',
-        title: '침대 하부',
-        subtitle: '리빙박스',
-        icon: 'bed-double',
-        slots: [
-          { code: 'C-1', label: '투명 리빙박스 1호' },
-          { code: 'C-2', label: '투명 리빙박스 2호' },
-          { code: 'C-3', label: '투명 리빙박스 3호' },
-        ],
-      },
-      D: {
-        id: 'D',
-        title: '책장 & 선반',
-        subtitle: '서류 · 책',
-        icon: 'book-open',
-        slots: [
-          { code: 'D-D', label: '중요 서류철' },
-          { code: 'D-B', label: '책 · 잡지' },
-        ],
-      },
-      E: {
-        id: 'E',
-        title: '창고 & 베란다',
-        subtitle: '공구 · 계절',
-        icon: 'warehouse',
-        slots: [
-          { code: 'E-T', label: '공구함' },
-          { code: 'E-S', label: '계절 가전' },
-        ],
-      },
-    };
-
-    const COLOR_LABELS = [
-      { id: 'slate', bg: 'bg-slate-400', ring: 'ring-slate-400', hex: '#94a3b8' },
-      { id: 'sky', bg: 'bg-sky-500', ring: 'ring-sky-500', hex: '#0ea5e9' },
-      { id: 'emerald', bg: 'bg-emerald-500', ring: 'ring-emerald-500', hex: '#10b981' },
-      { id: 'amber', bg: 'bg-amber-500', ring: 'ring-amber-500', hex: '#f59e0b' },
-      { id: 'rose', bg: 'bg-rose-500', ring: 'ring-rose-500', hex: '#f43f5e' },
-      { id: 'violet', bg: 'bg-violet-500', ring: 'ring-violet-500', hex: '#8b5cf6' },
+    const INITIAL_ITEMS = [
+      { id: 1, name: "노트북 & 충전 어댑터", zone: "A-1", tags: ["전자기기", "학습", "작업"], desc: "책상 위" },
+      { id: 2, name: "데스크 스탠드 조명", zone: "A-1", tags: ["조명", "책상"], desc: "책상 우측 모서리" },
+      { id: 3, name: "안경 및 스마트폰 충전 케이블", zone: "A-2", tags: ["안경", "충전기", "수면"], desc: "침대 옆 원형 협탁 상단" },
+      { id: 4, name: "식기류 및 프라이팬", zone: "B-1", tags: ["주방", "요리", "냄비"], desc: "메탈 랙 2~3단" },
+      { id: 5, name: "두루마리 휴지 & 키친타월", zone: "B-1", tags: ["생필품", "청소"], desc: "메탈 랙 상단 선반" },
+      { id: 6, name: "전공 서적 및 노트", zone: "B-2", tags: ["책", "물리", "공부"], desc: "원목 책장 1~2단" },
+      { id: 7, name: "외투 및 후드집업", zone: "C-1", tags: ["옷", "패딩", "행거"], desc: "옷장 메인 행거" },
+      { id: 8, name: "양말 및 이너웨어", zone: "C-1", tags: ["의류", "속옷"], desc: "옷장 좌측 와이어 바구니" },
+      { id: 9, name: "계절 지난 옷 & 여분 짐", zone: "D-1", tags: ["캐리어", "보관"], desc: "책장 옆 대형 캐리어 안" },
+      { id: 10, name: "칫솔, 치약, 면도기", zone: "E-1", tags: ["욕실", "세면도구", "위생"], desc: "욕실 거울 수납장 내부" }
     ];
 
-    const SEED_ITEMS = [
-      {
-        id: crypto.randomUUID(),
-        name: '여권 & 신분증',
-        zoneId: 'A',
-        slotCode: 'A-2',
-        tags: ['여행', '중요'],
-        memo: '서랍 안 지퍼 파우치',
-        color: 'amber',
-        updatedAt: Date.now(),
-      },
-      {
-        id: crypto.randomUUID(),
-        name: '겨울 패딩',
-        zoneId: 'B',
-        slotCode: 'B-T',
-        tags: ['의류', '계절'],
-        memo: '압축팩에 보관',
-        color: 'sky',
-        updatedAt: Date.now(),
-      },
-      {
-        id: crypto.randomUUID(),
-        name: '게스트 이불 세트',
-        zoneId: 'C',
-        slotCode: 'C-2',
-        tags: ['침구'],
-        memo: '',
-        color: 'emerald',
-        updatedAt: Date.now(),
-      },
-      {
-        id: crypto.randomUUID(),
-        name: '건강보험 증명서',
-        zoneId: 'D',
-        slotCode: 'D-D',
-        tags: ['서류', '중요'],
-        memo: '파란 서류철 2번 칸',
-        color: 'rose',
-        updatedAt: Date.now(),
-      },
-      {
-        id: crypto.randomUUID(),
-        name: '전동 드릴',
-        zoneId: 'E',
-        slotCode: 'E-T',
-        tags: ['공구', 'DIY'],
-        memo: '배터리 별도 충전',
-        color: 'slate',
-        updatedAt: Date.now(),
-      },
-    ];
-
-    let items = [];
-    let activeZoneFilter = null;
-    let editingId = null;
-    let selectedColor = 'sky';
-    let confirmResolve = null;
-
-    const CHOSUNG = 'ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎ';
-    const HANGUL_BASE = 0xac00;
-    const HANGUL_LAST = 0xd7a3;
-
-    function getChosungString(str) {
-      if (!str) return '';
-      let out = '';
-      for (const ch of str) {
-        const code = ch.charCodeAt(0);
-        if (code >= HANGUL_BASE && code <= HANGUL_LAST) {
-          out += CHOSUNG[Math.floor((code - HANGUL_BASE) / 588)];
-        } else {
-          out += ch.toLowerCase();
-        }
-      }
-      return out;
-    }
-
-    function normalizeQuery(q) {
-      return (q || '').trim().toLowerCase();
-    }
-
-    function itemSearchBlob(item) {
-      const zone = ZONES[item.zoneId];
-      const slot = zone?.slots.find((s) => s.code === item.slotCode);
-      const parts = [
-        item.name,
-        item.zoneId,
-        item.slotCode,
-        slot?.label,
-        zone?.title,
-        ...(item.tags || []),
-        item.memo,
-        getChosungString(item.name),
-        getChosungString(slot?.label || ''),
-        getChosungString((item.tags || []).join('')),
-        getChosungString(item.memo || ''),
-      ];
-      return parts.filter(Boolean).join(' ').toLowerCase();
-    }
-
-    function matchesSearch(item, query) {
-      if (!query) return true;
-      const blob = itemSearchBlob(item);
-      const q = normalizeQuery(query);
-      const qChosung = getChosungString(q);
-      if (blob.includes(q)) return true;
-      const chosungOnly = /^[ㄱ-ㅎ\s]+$/u.test(q);
-      if (chosungOnly && getChosungString(item.name).includes(qChosung.replace(/\s/g, ''))) return true;
-      if (qChosung && blob.includes(qChosung)) return true;
-      return false;
-    }
+    const STORAGE_KEY = 'room_inventory_items_v2';
 
     function loadItems() {
       try {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if (!raw) {
-          items = structuredClone(SEED_ITEMS);
-          saveItems(false);
-          return;
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
         }
-        const parsed = JSON.parse(raw);
-        if (!Array.isArray(parsed) || parsed.length === 0) {
-          items = structuredClone(SEED_ITEMS);
-          saveItems(false);
-          return;
-        }
-        items = parsed;
-      } catch {
-        items = structuredClone(SEED_ITEMS);
-        saveItems(false);
-        toast('저장 데이터를 불러오지 못해 초기 데이터를 사용합니다.', 'warn');
+      } catch (e) {
+        console.warn("로컬 저장소 로드 실패, 기본 데이터를 사용합니다.", e);
+      }
+      return [...INITIAL_ITEMS];
+    }
+
+    function saveItems(list) {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+      } catch (e) {
+        console.error("로컬 저장소 저장 실패", e);
       }
     }
 
-    function saveItems(showToast = true) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
-      if (showToast) toast('저장되었습니다', 'success');
-    }
+    let items = loadItems();
+    let currentZone = null;
 
-    function toast(message, type = 'info') {
-      const container = document.getElementById('toast-container');
-      const el = document.createElement('div');
-      const styles = {
-        success: 'border-emerald-200 bg-white text-emerald-800',
-        warn: 'border-amber-200 bg-white text-amber-900',
-        error: 'border-red-200 bg-white text-red-800',
-        info: 'border-sky-200 bg-white text-slate-800',
-      };
-      el.className = `toast-enter flex items-start gap-2 rounded-xl border px-4 py-3 text-sm shadow-lg ${styles[type] || styles.info}`;
-      const iconName = type === 'success' ? 'check-circle' : type === 'error' ? 'alert-circle' : 'info';
-      el.innerHTML = `<i data-lucide="${iconName}" class="mt-0.5 shrink-0"></i><span>${escapeHtml(message)}</span>`;
-      container.appendChild(el);
-      lucide.createIcons({ nodes: [el] });
-      setTimeout(() => {
-        el.style.opacity = '0';
-        el.style.transition = 'opacity 0.2s';
-        setTimeout(() => el.remove(), 220);
-      }, 2800);
-    }
-
-    function escapeHtml(s) {
-      const d = document.createElement('div');
-      d.textContent = s;
-      return d.innerHTML;
-    }
-
-    function showConfirm(message) {
-      return new Promise((resolve) => {
-        confirmResolve = resolve;
-        document.getElementById('confirm-message').textContent = message;
-        const dlg = document.getElementById('confirm-dialog');
-        dlg.classList.remove('hidden');
-        dlg.classList.add('flex');
-      });
-    }
-
-    function hideConfirm(result) {
-      const dlg = document.getElementById('confirm-dialog');
-      dlg.classList.add('hidden');
-      dlg.classList.remove('flex');
-      if (confirmResolve) confirmResolve(result);
-      confirmResolve = null;
-    }
-
-    function getFilteredItems() {
-      const q = document.getElementById('search-input').value;
-      return items
-        .filter((item) => (activeZoneFilter ? item.zoneId === activeZoneFilter : true))
-        .filter((item) => matchesSearch(item, q))
-        .sort((a, b) => b.updatedAt - a.updatedAt);
-    }
-
-    function colorMeta(id) {
-      return COLOR_LABELS.find((c) => c.id === id) || COLOR_LABELS[1];
-    }
-
-    function renderZones() {
-      const grid = document.getElementById('zone-grid');
+    function updateZoneCounts() {
       const counts = {};
-      items.forEach((i) => {
-        counts[i.zoneId] = (counts[i.zoneId] || 0) + 1;
+      items.forEach(item => {
+        counts[item.zone] = (counts[item.zone] || 0) + 1;
       });
-
-      grid.innerHTML = Object.values(ZONES)
-        .map((z) => {
-          const active = activeZoneFilter === z.id;
-          return `
-          <button type="button" data-zone="${z.id}" class="zone-card group text-left rounded-2xl border border-slate-200/90 bg-white p-4 shadow-sm transition hover:border-sky-200 hover:shadow-md ${active ? 'active ring-2 ring-sky-500 border-sky-400 bg-sky-50/50' : ''}">
-            <div class="mb-2 flex items-center justify-between">
-              <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-sky-100 text-sky-600">
-                <i data-lucide="${z.icon}"></i>
-              </span>
-              <span class="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600">${counts[z.id] || 0}</span>
-            </div>
-            <p class="text-xs font-bold text-sky-700">${z.id}구역</p>
-            <p class="mt-0.5 text-sm font-semibold text-slate-900 leading-snug">${escapeHtml(z.title)}</p>
-            <p class="mt-1 text-[11px] text-slate-500">${escapeHtml(z.subtitle)}</p>
-          </button>`;
-        })
-        .join('');
-
-      grid.querySelectorAll('[data-zone]').forEach((btn) => {
-        btn.addEventListener('click', () => {
-          const id = btn.getAttribute('data-zone');
-          activeZoneFilter = activeZoneFilter === id ? null : id;
-          document.getElementById('btn-clear-zone').classList.toggle('hidden', !activeZoneFilter);
-          renderZones();
-          renderItems();
-        });
+      document.querySelectorAll(".zone-count").forEach(el => {
+        const zone = el.getAttribute("data-zone");
+        el.textContent = counts[zone] || 0;
       });
-
-      lucide.createIcons({ nodes: [grid] });
     }
 
-    function renderItems() {
-      const list = getFilteredItems();
-      const grid = document.getElementById('items-grid');
-      const empty = document.getElementById('empty-state');
-      document.getElementById('result-count').textContent = `${list.length}개`;
+    function renderItems(filterText = "", zoneFilter = null) {
+      const listContainer = document.getElementById("item-list");
+      listContainer.innerHTML = "";
 
-      if (list.length === 0) {
-        grid.innerHTML = '';
-        empty.classList.remove('hidden');
+      const query = filterText.trim().toLowerCase();
+      const filtered = items.filter(item => {
+        const matchesZone = zoneFilter ? item.zone === zoneFilter : true;
+        const matchesQuery = !query || 
+                             item.name.toLowerCase().includes(query) ||
+                             (item.tags && item.tags.some(t => t.toLowerCase().includes(query))) ||
+                             item.zone.toLowerCase().includes(query) ||
+                             (item.desc && item.desc.toLowerCase().includes(query));
+        return matchesZone && matchesQuery;
+      });
+
+      document.getElementById("item-count").textContent = filtered.length;
+
+      if (filtered.length === 0) {
+        listContainer.innerHTML = `
+          <div class="col-span-full py-12 text-center text-slate-400 text-sm bg-white rounded-2xl border border-dashed border-slate-200">
+            <div class="text-2xl mb-1">📦</div>
+            <div>해당 조건에 맞는 물건이 없습니다.</div>
+            <button onclick="resetFilter()" class="mt-3 text-xs text-blue-600 hover:underline">전체 목록 보기</button>
+          </div>
+        `;
         return;
       }
-      empty.classList.add('hidden');
 
-      grid.innerHTML = list
-        .map((item) => {
-          const zone = ZONES[item.zoneId];
-          const slot = zone.slots.find((s) => s.code === item.slotCode);
-          const col = colorMeta(item.color);
-          const tagHtml = (item.tags || [])
-            .slice(0, 4)
-            .map((t) => `<span class="rounded-md bg-slate-100 px-1.5 py-0.5 text-[10px] font-medium text-slate-600">${escapeHtml(t)}</span>`)
-            .join('');
-          return `
-          <article class="item-card cursor-pointer rounded-2xl border border-slate-200/90 bg-white p-4 shadow-sm hover:shadow-md" data-edit-id="${item.id}">
-            <div class="flex gap-3">
-              <div class="mt-1 h-10 w-1 shrink-0 rounded-full ${col.bg}"></div>
-              <div class="min-w-0 flex-1">
-                <div class="flex items-start justify-between gap-2">
-                  <h3 class="truncate text-base font-semibold text-slate-900">${escapeHtml(item.name)}</h3>
-                  <span class="shrink-0 rounded-lg bg-sky-50 px-2 py-0.5 text-[11px] font-bold text-sky-700">${escapeHtml(item.slotCode)}</span>
-                </div>
-                <p class="mt-0.5 text-xs text-slate-500">${escapeHtml(zone.title)} · ${escapeHtml(slot?.label || '')}</p>
-                ${item.memo ? `<p class="mt-2 line-clamp-2 text-xs text-slate-600">${escapeHtml(item.memo)}</p>` : ''}
-                ${tagHtml ? `<div class="mt-2 flex flex-wrap gap-1">${tagHtml}</div>` : ''}
+      filtered.forEach(item => {
+        const card = document.createElement("div");
+        card.className = "item-card bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between group";
+        card.setAttribute("data-id", item.id);
+        card.onclick = (e) => {
+          // 태그나 버튼 클릭 시 카드 전체 클릭 이벤트 버블링 방지
+          if (e.target.closest('button') || e.target.closest('.tag-chip') || e.target.closest('.zone-badge-btn')) return;
+          highlightZone(item.zone);
+        };
+
+        const tagsHtml = (item.tags || []).map(t => 
+          `<button type="button" onclick="searchTag('${t}')" class="tag-chip text-[11px] bg-slate-100 hover:bg-blue-50 hover:text-blue-600 text-slate-600 px-2 py-0.5 rounded-full transition">#${t}</button>`
+        ).join("");
+
+        card.innerHTML = `
+          <div>
+            <div class="flex items-center justify-between">
+              <button type="button" onclick="selectZone('${item.zone}')" class="zone-badge-btn text-xs font-semibold px-2 py-0.5 rounded bg-blue-100 hover:bg-blue-200 text-blue-700 font-mono transition cursor-pointer" title="이 구역만 보기">
+                ${item.zone}
+              </button>
+              <div class="flex items-center gap-1.5">
+                <span class="text-xs text-slate-400">${item.desc || ""}</span>
+                <button type="button" onclick="deleteItem(${item.id})" class="opacity-0 group-hover:opacity-100 text-slate-300 hover:text-red-500 p-1 text-xs transition" title="물건 삭제">✕</button>
               </div>
             </div>
-          </article>`;
-        })
-        .join('');
-
-      grid.querySelectorAll('[data-edit-id]').forEach((card) => {
-        card.addEventListener('click', () => openModal(card.getAttribute('data-edit-id')));
+            <h4 class="text-base font-semibold text-slate-800 mt-2 hover:text-blue-600 transition flex items-center justify-between">
+              <span>${item.name}</span>
+              <span class="text-[11px] text-blue-500 opacity-0 group-hover:opacity-100 transition font-normal">지도 위치 보기 ↗</span>
+            </h4>
+          </div>
+          <div class="flex flex-wrap gap-1 mt-3">
+            ${tagsHtml}
+          </div>
+        `;
+        listContainer.appendChild(card);
       });
     }
 
-    function populateZoneSelects() {
-      const zoneSel = document.getElementById('field-zone');
-      zoneSel.innerHTML = Object.values(ZONES)
-        .map((z) => `<option value="${z.id}">${z.id} — ${escapeHtml(z.title)}</option>`)
-        .join('');
-      zoneSel.addEventListener('change', updateSlotSelect);
-    }
-
-    function updateSlotSelect() {
-      const zoneId = document.getElementById('field-zone').value;
-      const slotSel = document.getElementById('field-slot');
-      const zone = ZONES[zoneId];
-      slotSel.innerHTML = zone.slots.map((s) => `<option value="${s.code}">${s.code} · ${escapeHtml(s.label)}</option>`).join('');
-    }
-
-    function renderColorPicker() {
-      const wrap = document.getElementById('color-picker');
-      wrap.innerHTML = COLOR_LABELS.map(
-        (c) => `
-        <button type="button" data-color="${c.id}" class="h-8 w-8 rounded-full ${c.bg} ring-offset-2 transition hover:scale-105 ${selectedColor === c.id ? 'ring-2 ' + c.ring : 'ring-0'}" aria-label="${c.id}"></button>`
-      ).join('');
-      wrap.querySelectorAll('[data-color]').forEach((btn) => {
-        btn.addEventListener('click', () => {
-          selectedColor = btn.getAttribute('data-color');
-          renderColorPicker();
-        });
-      });
-    }
-
-    function openModal(id = null) {
-      editingId = id;
-      const modal = document.getElementById('item-modal');
-      const backdrop = document.getElementById('modal-backdrop');
-      const deleteBtn = document.getElementById('btn-delete');
-      document.getElementById('modal-title').textContent = id ? '물건 수정' : '물건 추가';
-      deleteBtn.classList.toggle('hidden', !id);
-
-      if (id) {
-        const item = items.find((i) => i.id === id);
-        if (!item) return;
-        document.getElementById('field-id').value = item.id;
-        document.getElementById('field-name').value = item.name;
-        document.getElementById('field-zone').value = item.zoneId;
-        updateSlotSelect();
-        document.getElementById('field-slot').value = item.slotCode;
-        document.getElementById('field-tags').value = (item.tags || []).join(', ');
-        document.getElementById('field-memo').value = item.memo || '';
-        selectedColor = item.color || 'sky';
-      } else {
-        document.getElementById('item-form').reset();
-        document.getElementById('field-id').value = '';
-        document.getElementById('field-zone').value = 'A';
-        updateSlotSelect();
-        selectedColor = 'sky';
-      }
-      renderColorPicker();
-      modal.classList.remove('hidden');
-      backdrop.classList.remove('hidden');
-      document.getElementById('field-name').focus();
-    }
-
-    function closeModal() {
-      document.getElementById('item-modal').classList.add('hidden');
-      document.getElementById('modal-backdrop').classList.add('hidden');
-      editingId = null;
-    }
-
-    function parseTags(raw) {
-      return raw
-        .split(',')
-        .map((t) => t.trim())
-        .filter(Boolean);
-    }
-
-    function handleFormSubmit(e) {
-      e.preventDefault();
-      const name = document.getElementById('field-name').value.trim();
-      if (!name) {
-        toast('이름을 입력해 주세요', 'warn');
+    function selectZone(zoneId) {
+      if (currentZone === zoneId) {
+        resetFilter();
         return;
       }
-      const payload = {
-        name,
-        zoneId: document.getElementById('field-zone').value,
-        slotCode: document.getElementById('field-slot').value,
-        tags: parseTags(document.getElementById('field-tags').value),
-        memo: document.getElementById('field-memo').value.trim(),
-        color: selectedColor,
-        updatedAt: Date.now(),
+
+      currentZone = zoneId;
+      document.querySelectorAll(".zone-box").forEach(el => el.classList.remove("zone-active"));
+
+      const targetBox = document.getElementById(`zone-${zoneId}`);
+      if (targetBox) {
+        targetBox.classList.add("zone-active");
+        highlightZone(zoneId, false);
+      }
+
+      const zoneNames = {
+        'A-1': 'A-1 책상',
+        'A-2': 'A-2 원형 협탁',
+        'A-3': 'A-3 침대 & 하단',
+        'B-1': 'B-1 메탈 선반',
+        'B-2': 'B-2 원목 책장',
+        'C-1': 'C-1 붙박이 옷장',
+        'D-1': 'D-1 구석 캐리어',
+        'E-1': 'E-1 욕실 수납함'
       };
 
-      const existingId = document.getElementById('field-id').value;
-      if (existingId) {
-        const idx = items.findIndex((i) => i.id === existingId);
-        if (idx >= 0) items[idx] = { ...items[idx], ...payload };
+      document.getElementById("active-zone-label").textContent = `${zoneNames[zoneId] || zoneId} 선택됨 (클릭 시 해제)`;
+      renderItems(document.getElementById("search-input").value, currentZone);
+    }
+
+    function highlightZone(zoneId, filterIfDifferent = true) {
+      const targetBox = document.getElementById(`zone-${zoneId}`);
+      if (!targetBox) return;
+
+      targetBox.classList.remove("zone-highlight");
+      // 강제 리플로우로 애니메이션 재실행
+      void targetBox.offsetWidth;
+      targetBox.classList.add("zone-highlight");
+
+      // 화면이 스크롤되어 있다면 지도 위치로 부드럽게 스크롤
+      const rect = targetBox.getBoundingClientRect();
+      if (rect.top < 0 || rect.bottom > window.innerHeight) {
+        targetBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+
+      if (filterIfDifferent && currentZone !== zoneId) {
+        selectZone(zoneId);
+      }
+    }
+
+    function resetFilter() {
+      currentZone = null;
+      document.querySelectorAll(".zone-box").forEach(el => el.classList.remove("zone-active"));
+      document.getElementById("active-zone-label").textContent = "전체 구역 표시 중";
+      document.getElementById("search-input").value = "";
+      document.getElementById("clear-search-btn").classList.add("hidden");
+      renderItems();
+    }
+
+    function handleSearch() {
+      const q = document.getElementById("search-input").value;
+      const clearBtn = document.getElementById("clear-search-btn");
+      if (q.trim().length > 0) {
+        clearBtn.classList.remove("hidden");
       } else {
-        items.push({ id: crypto.randomUUID(), ...payload });
+        clearBtn.classList.add("hidden");
       }
-      saveItems();
-      closeModal();
-      renderZones();
-      renderItems();
+      renderItems(q, currentZone);
     }
 
-    async function handleDelete() {
-      const id = document.getElementById('field-id').value;
-      if (!id) return;
-      const ok = await showConfirm('이 물건을 삭제할까요?');
-      if (!ok) return;
-      items = items.filter((i) => i.id !== id);
-      saveItems();
-      closeModal();
-      renderZones();
-      renderItems();
-      toast('삭제되었습니다', 'info');
+    function clearSearch() {
+      document.getElementById("search-input").value = "";
+      document.getElementById("clear-search-btn").classList.add("hidden");
+      renderItems("", currentZone);
     }
 
-    function exportData() {
-      const blob = new Blob([JSON.stringify({ version: 1, exportedAt: new Date().toISOString(), items }, null, 2)], {
-        type: 'application/json',
-      });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `myroom-backup-${new Date().toISOString().slice(0, 10)}.json`;
-      a.click();
-      URL.revokeObjectURL(url);
-      toast('백업 파일을 다운로드했습니다', 'success');
+    function searchTag(tag) {
+      const input = document.getElementById("search-input");
+      input.value = tag;
+      document.getElementById("clear-search-btn").classList.remove("hidden");
+      renderItems(tag, currentZone);
     }
 
-    async function importData(file) {
-      if (!file) return;
-      try {
-        const text = await file.text();
-        const data = JSON.parse(text);
-        const incoming = Array.isArray(data) ? data : data.items;
-        if (!Array.isArray(incoming)) throw new Error('invalid');
-        const ok = await showConfirm(`물건 ${incoming.length}개로 데이터를 교체할까요?`);
-        if (!ok) return;
-        items = incoming.map((i) => ({
-          id: i.id || crypto.randomUUID(),
-          name: i.name || '이름 없음',
-          zoneId: ZONES[i.zoneId] ? i.zoneId : 'A',
-          slotCode: i.slotCode || ZONES[i.zoneId]?.slots[0]?.code || 'A-1',
-          tags: Array.isArray(i.tags) ? i.tags : [],
-          memo: i.memo || '',
-          color: COLOR_LABELS.some((c) => c.id === i.color) ? i.color : 'sky',
-          updatedAt: i.updatedAt || Date.now(),
-        }));
-        saveItems();
-        renderZones();
-        renderItems();
-        toast('복원이 완료되었습니다', 'success');
-      } catch {
-        toast('JSON 파일을 읽을 수 없습니다', 'error');
+    function deleteItem(id) {
+      if (!confirm("이 물건을 목록에서 삭제하시겠습니까?")) return;
+      items = items.filter(i => i.id !== id);
+      saveItems(items);
+      updateZoneCounts();
+      renderItems(document.getElementById("search-input").value, currentZone);
+    }
+
+    function openAddModal() {
+      const modal = document.getElementById("add-modal");
+      if (currentZone) {
+        document.getElementById("modal-zone").value = currentZone;
       }
-      document.getElementById('import-file').value = '';
+      modal.classList.remove("hidden");
+      document.getElementById("modal-name").focus();
     }
 
-    function bindEvents() {
-      document.getElementById('search-input').addEventListener('input', renderItems);
-      document.getElementById('btn-add').addEventListener('click', () => openModal());
-      document.getElementById('btn-export').addEventListener('click', exportData);
-      document.getElementById('import-file').addEventListener('change', (e) => importData(e.target.files[0]));
-      document.getElementById('item-form').addEventListener('submit', handleFormSubmit);
-      document.getElementById('btn-delete').addEventListener('click', handleDelete);
-      document.getElementById('modal-close').addEventListener('click', closeModal);
-      document.getElementById('modal-cancel').addEventListener('click', closeModal);
-      document.getElementById('modal-backdrop').addEventListener('click', closeModal);
-      document.getElementById('btn-clear-zone').addEventListener('click', () => {
-        activeZoneFilter = null;
-        document.getElementById('btn-clear-zone').classList.add('hidden');
-        renderZones();
-        renderItems();
-      });
-      document.getElementById('confirm-cancel').addEventListener('click', () => hideConfirm(false));
-      document.getElementById('confirm-backdrop').addEventListener('click', () => hideConfirm(false));
-      document.getElementById('confirm-ok').addEventListener('click', () => hideConfirm(true));
-
-      document.addEventListener('keydown', (e) => {
-        if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
-          e.preventDefault();
-          document.getElementById('search-input').focus();
-          document.getElementById('search-input').select();
-        }
-        if (e.key === 'Escape') {
-          if (!document.getElementById('confirm-dialog').classList.contains('hidden')) {
-            hideConfirm(false);
-          } else if (!document.getElementById('item-modal').classList.contains('hidden')) {
-            closeModal();
-          }
-        }
-      });
+    function closeAddModal() {
+      document.getElementById("add-modal").classList.add("hidden");
+      document.getElementById("add-form").reset();
     }
 
-    function init() {
-      loadItems();
-      populateZoneSelects();
-      updateSlotSelect();
-      renderColorPicker();
-      bindEvents();
-      renderZones();
-      renderItems();
-      lucide.createIcons();
+    function handleAddItem(e) {
+      e.preventDefault();
+      const name = document.getElementById("modal-name").value.trim();
+      const zone = document.getElementById("modal-zone").value;
+      const desc = document.getElementById("modal-desc").value.trim();
+      const rawTags = document.getElementById("modal-tags").value;
+      const tags = rawTags.split(",").map(t => t.trim()).filter(Boolean);
+
+      if (!name) return;
+
+      const newItem = {
+        id: Date.now(),
+        name,
+        zone,
+        desc: desc || "보관 중",
+        tags: tags.length > 0 ? tags : ["기타"]
+      };
+
+      items.unshift(newItem);
+      saveItems(items);
+      updateZoneCounts();
+      closeAddModal();
+      selectZone(zone);
     }
 
-    init();
+    // 초기화
+    updateZoneCounts();
+    renderItems();
   </script>
 </body>
 </html>
