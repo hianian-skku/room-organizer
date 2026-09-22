@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>방 수납 인벤토리 지도</title>
+  <title>방 수납 인벤토리 지도 — 구조도 드릴다운</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://cdn.jsdelivr.net">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
@@ -18,14 +18,29 @@
     }
     .zone-box:hover {
       transform: translateY(-2px);
-      box-shadow: 0 6px 16px -2px rgba(37, 99, 235, 0.12), 0 2px 6px -1px rgba(0, 0, 0, 0.06);
+      box-shadow: 0 8px 20px -3px rgba(37, 99, 235, 0.15), 0 3px 8px -2px rgba(0, 0, 0, 0.08);
     }
     .zone-active {
       border-color: #2563eb !important;
       background-color: #eff6ff !important;
       color: #1d4ed8 !important;
+      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.3), 0 8px 20px -3px rgba(37, 99, 235, 0.2) !important;
+    }
+    .slot-box {
+      transition: all 0.18s ease-in-out;
+      cursor: pointer;
+    }
+    .slot-box:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      border-color: #3b82f6;
+    }
+    .slot-active {
+      border-color: #2563eb !important;
+      background-color: #dbeafe !important;
+      color: #1e40af !important;
       font-weight: 700;
-      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.25), 0 6px 16px -2px rgba(37, 99, 235, 0.2) !important;
+      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.4) !important;
     }
     .item-card {
       transition: all 0.2s ease-in-out;
@@ -36,31 +51,49 @@
       box-shadow: 0 6px 16px -2px rgba(0, 0, 0, 0.08);
       border-color: #cbd5e1;
     }
-    @keyframes zone-ping {
-      0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.6); }
-      50% { transform: scale(1.03); box-shadow: 0 0 0 10px rgba(37, 99, 235, 0); }
+    @keyframes slot-ping {
+      0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.7); }
+      50% { transform: scale(1.02); box-shadow: 0 0 0 8px rgba(37, 99, 235, 0); }
       100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(37, 99, 235, 0); }
     }
-    .zone-highlight {
-      animation: zone-ping 0.8s ease-in-out;
+    .slot-highlight {
+      animation: slot-ping 0.8s ease-in-out;
+    }
+    /* 스크롤바 커스텀 */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
     }
   </style>
 </head>
-<body class="bg-slate-50 text-slate-800 p-4 md:p-8 min-h-screen">
+<body class="bg-slate-50 text-slate-800 p-3 sm:p-6 md:p-8 min-h-screen">
 
-  <div class="max-w-4xl mx-auto space-y-6">
+  <div class="max-w-5xl mx-auto space-y-6">
     <!-- 헤더 -->
     <header class="flex flex-wrap justify-between items-center gap-3 pb-3 border-b border-slate-200">
       <div>
         <h1 class="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
           <span>방 수납 인벤토리</span>
-          <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">Interactive Map</span>
+          <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-700">스마트 드릴다운</span>
         </h1>
-        <p class="text-sm text-slate-500 mt-1">방 구조 미니맵이나 물건 카드를 직접 클릭해서 위치를 한눈에 확인하세요.</p>
+        <p class="text-xs sm:text-sm text-slate-500 mt-1">
+          가구(선반, 책장, 옷장, 화장실)를 클릭하면 <strong>실제 층별·칸별 세부 구조도</strong>가 열려 정확한 위치를 관리할 수 있습니다.
+        </p>
       </div>
       <div class="flex items-center gap-2">
-        <button onclick="resetFilter()" class="text-xs bg-slate-200 hover:bg-slate-300 active:scale-95 text-slate-700 px-3 py-2 rounded-xl font-medium transition flex items-center gap-1.5 shadow-sm">
-          <span>🔄 전체 보기</span>
+        <button onclick="resetToRoomView()" class="text-xs bg-slate-200 hover:bg-slate-300 active:scale-95 text-slate-700 px-3.5 py-2 rounded-xl font-medium transition flex items-center gap-1.5 shadow-sm">
+          <span>🏠 방 전체 보기</span>
         </button>
         <button onclick="openAddModal()" class="text-xs bg-blue-600 hover:bg-blue-700 active:scale-95 text-white px-3.5 py-2 rounded-xl font-medium transition flex items-center gap-1.5 shadow-sm shadow-blue-500/20">
           <span>+ 물건 등록</span>
@@ -68,96 +101,208 @@
       </div>
     </header>
 
-    <!-- 인터랙티브 방 구조 미니맵 UI -->
-    <section class="bg-white p-5 md:p-6 rounded-2xl shadow-sm border border-slate-200">
+    <!-- 네비게이션 브레드크럼 & 현재 뷰 상태 -->
+    <div class="flex flex-wrap items-center justify-between gap-2 bg-white px-4 py-2.5 rounded-xl border border-slate-200 shadow-sm text-xs">
+      <nav class="flex items-center gap-1.5 text-slate-600 font-medium overflow-x-auto py-0.5">
+        <button onclick="resetToRoomView()" class="hover:text-blue-600 flex items-center gap-1">
+          <span>🏠 방 전체 평면도</span>
+        </button>
+        <span id="breadcrumb-separator" class="text-slate-300 hidden">&gt;</span>
+        <span id="breadcrumb-unit" class="text-blue-600 font-bold hidden">가구 상세</span>
+        <span id="breadcrumb-slot-separator" class="text-slate-300 hidden">&gt;</span>
+        <span id="breadcrumb-slot" class="text-blue-800 font-semibold bg-blue-50 px-2 py-0.5 rounded hidden">세부 층/칸</span>
+      </nav>
+
+      <div class="flex items-center gap-2">
+        <span id="active-filter-badge" class="font-medium text-blue-700 bg-blue-50 border border-blue-100 px-2.5 py-1 rounded-lg">
+          전체 구역 표시 중
+        </span>
+        <button id="btn-view-all-in-unit" onclick="viewAllInCurrentUnit()" class="hidden text-xs text-blue-600 hover:underline">
+          이 가구 전체 보기
+        </button>
+      </div>
+    </div>
+
+    <!-- 1. 방 전체 평면도 (스케치 1번 사진 완벽 반영) -->
+    <section id="room-map-section" class="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-slate-200 transition-all">
       <div class="flex items-center justify-between mb-3">
         <div class="flex items-center gap-2">
-          <h2 class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Room Layout Map</h2>
-          <span class="text-[11px] text-slate-400 font-normal">구역 클릭 시 해당 위치 물건만 필터링</span>
+          <h2 class="text-xs font-bold text-slate-500 uppercase tracking-wider">Room Layout Map</h2>
+          <span class="text-[11px] text-slate-400 font-normal">선반, 책장, 옷장, 화장실 수납함을 클릭하면 세부 층 구조도가 열립니다.</span>
         </div>
-        <span id="active-zone-label" class="text-xs font-medium text-blue-600 bg-blue-50 px-2.5 py-1 rounded-lg border border-blue-100 transition-all">전체 구역 표시 중</span>
+        <span class="text-[11px] text-blue-500 font-medium">가구 클릭 시 드릴다운 ↘</span>
       </div>
 
-      <!-- 평면도 그리드 -->
-      <div class="grid grid-cols-4 gap-3 text-center text-xs md:text-sm select-none">
-        <!-- 창가 쪽 -->
-        <div class="col-span-4 bg-slate-100 py-1.5 rounded-xl text-slate-400 font-mono text-[11px] border border-dashed border-slate-300">
-          [ 창문 및 라디에이터 영역 ]
+      <!-- 평면도 그리드: 스케치 기준 좌측 열 & 우측 열 -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 select-none">
+
+        <!-- [좌측 영역] 책상, 협탁, 침대, 화장실 수납함 -->
+        <div class="space-y-3">
+          <div class="text-[11px] font-semibold text-slate-400 px-1 flex items-center justify-between">
+            <span>[ 방 좌측 구역 ]</span>
+            <span>작업 & 휴식 & 욕실</span>
+          </div>
+
+          <!-- A-1 책상 -->
+          <div onclick="selectSlot('desk', 'desk-top')" id="zone-card-desk" class="zone-box bg-slate-50 border border-slate-200 p-4 rounded-xl flex items-center justify-between">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="font-bold text-slate-800 text-sm md:text-base">A-1 책상</span>
+                <span class="text-xs bg-slate-200 text-slate-700 px-2 py-0.5 rounded-full font-mono font-semibold" data-unit-count="desk">0</span>
+              </div>
+              <p class="text-xs text-slate-500 mt-1">노트북, 데스크 스탠드, 필기구, 작업 상판</p>
+            </div>
+            <span class="text-xs text-slate-400">상판/서랍 ➔</span>
+          </div>
+
+          <!-- A-2 원형 협탁 -->
+          <div onclick="selectSlot('side-table', 'side-table-top')" id="zone-card-side-table" class="zone-box bg-slate-50 border border-slate-200 p-4 rounded-xl flex items-center justify-between">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="font-bold text-slate-800 text-sm md:text-base">A-2 원형 협탁</span>
+                <span class="text-xs bg-slate-200 text-slate-700 px-2 py-0.5 rounded-full font-mono font-semibold" data-unit-count="side-table">0</span>
+              </div>
+              <p class="text-xs text-slate-500 mt-1">침대 옆 원형 협탁 (안경, 스마트폰 충전기, 수면 용품)</p>
+            </div>
+            <span class="text-xs text-slate-400">상판 ➔</span>
+          </div>
+
+          <!-- 침대 (스케치 요구사항: 크기 여유 유지, 하단 보관 X) -->
+          <div class="bg-gradient-to-r from-blue-50/50 to-indigo-50/40 border border-dashed border-blue-200/80 p-5 rounded-2xl flex flex-col justify-center items-center text-center">
+            <div class="flex items-center gap-2">
+              <span class="text-lg">🛏️</span>
+              <span class="font-bold text-slate-700 text-sm md:text-base">침대 영역 (Bed)</span>
+            </div>
+            <p class="text-xs text-blue-600 font-medium mt-1">
+              "여기 하단에 아직 보관 X (스케치 반영 크기 여유 유지)"
+            </p>
+            <span class="text-[11px] text-slate-400 mt-0.5">추후 하단 리빙박스 배치 시 수납 구역 확장 가능</span>
+          </div>
+
+          <!-- 화장실 수납함 (사진 4) -->
+          <div onclick="openUnitDetail('bathroom')" id="zone-card-bathroom" class="zone-box bg-blue-50/60 border-2 border-blue-200/70 p-4 rounded-xl flex items-center justify-between hover:border-blue-500">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="font-bold text-slate-900 text-sm md:text-base flex items-center gap-1.5">
+                  <span>🚿 화장실 수납함</span>
+                  <span class="text-[10px] bg-blue-500 text-white px-1.5 py-0.5 rounded font-medium">3단 미러장</span>
+                </span>
+                <span class="text-xs bg-blue-200 text-blue-800 px-2 py-0.5 rounded-full font-mono font-semibold" data-unit-count="bathroom">0</span>
+              </div>
+              <p class="text-xs text-slate-600 mt-1">거울 수납장 3단 선반 + 세면대 트레이 (세면도구, 칫솔, 샴푸)</p>
+            </div>
+            <span class="text-xs font-semibold text-blue-600 bg-white px-2.5 py-1 rounded-lg border border-blue-200 shadow-xs">
+              세부 구조 🔍
+            </span>
+          </div>
         </div>
 
-        <!-- 1행: 책상 / 선반 / 러기지 -->
-        <div onclick="selectZone('A-1')" id="zone-A-1" class="zone-box col-span-2 bg-slate-50 border border-slate-200 p-4 rounded-xl flex flex-col items-center justify-center">
-          <div class="flex items-center gap-1.5">
-            <span class="font-bold">A-1 책상</span>
-            <span class="zone-count text-[10px] bg-slate-200/80 text-slate-600 px-1.5 py-0.5 rounded-full" data-zone="A-1">0</span>
+        <!-- [우측 영역] 기타 등등, 메탈 선반(5층), 원목 책장(4층), 옷장 -->
+        <div class="space-y-3">
+          <div class="text-[11px] font-semibold text-slate-400 px-1 flex items-center justify-between">
+            <span>[ 방 우측 구역 ]</span>
+            <span>집중 수납 & 옷장 타워</span>
           </div>
-          <span class="text-[11px] text-slate-500 mt-0.5">노트북, 스탠드, 필기구</span>
-        </div>
-        <div onclick="selectZone('B-1')" id="zone-B-1" class="zone-box bg-slate-50 border border-slate-200 p-4 rounded-xl flex flex-col items-center justify-center">
-          <div class="flex items-center gap-1.5">
-            <span class="font-bold">B-1 메탈 선반</span>
-            <span class="zone-count text-[10px] bg-slate-200/80 text-slate-600 px-1.5 py-0.5 rounded-full" data-zone="B-1">0</span>
-          </div>
-          <span class="text-[11px] text-slate-500 mt-0.5">식기, 휴지, 박스</span>
-        </div>
-        <div onclick="selectZone('B-2')" id="zone-B-2" class="zone-box bg-slate-50 border border-slate-200 p-4 rounded-xl flex flex-col items-center justify-center">
-          <div class="flex items-center gap-1.5">
-            <span class="font-bold">B-2 원목 책장</span>
-            <span class="zone-count text-[10px] bg-slate-200/80 text-slate-600 px-1.5 py-0.5 rounded-full" data-zone="B-2">0</span>
-          </div>
-          <span class="text-[11px] text-slate-500 mt-0.5">책, 전자기기 부자재</span>
-        </div>
 
-        <!-- 2행: 협탁 / 중앙 공간 / 캐리어 -->
-        <div onclick="selectZone('A-2')" id="zone-A-2" class="zone-box bg-slate-50 border border-slate-200 p-4 rounded-xl flex flex-col items-center justify-center">
-          <div class="flex items-center gap-1.5">
-            <span class="font-bold">A-2 원형 협탁</span>
-            <span class="zone-count text-[10px] bg-slate-200/80 text-slate-600 px-1.5 py-0.5 rounded-full" data-zone="A-2">0</span>
+          <!-- 기타 등등 -->
+          <div onclick="selectSlot('etc', 'etc-carrier')" id="zone-card-etc" class="zone-box bg-slate-50 border border-slate-200 p-4 rounded-xl flex items-center justify-between">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="font-bold text-slate-800 text-sm md:text-base">기타 등등 (캐리어/여분)</span>
+                <span class="text-xs bg-slate-200 text-slate-700 px-2 py-0.5 rounded-full font-mono font-semibold" data-unit-count="etc">0</span>
+              </div>
+              <p class="text-xs text-slate-500 mt-1">대형 캐리어, 계절 지난 옷, 장기 보관 여분 짐</p>
+            </div>
+            <span class="text-xs text-slate-400">선택 ➔</span>
           </div>
-          <span class="text-[11px] text-slate-500 mt-0.5">안경, 충전기</span>
-        </div>
-        <div class="col-span-2 bg-slate-50/50 border border-dashed border-slate-200 rounded-xl flex items-center justify-center text-slate-300 text-[11px]">
-          중앙 활동 공간 / 의자
-        </div>
-        <div onclick="selectZone('D-1')" id="zone-D-1" class="zone-box bg-slate-50 border border-slate-200 p-4 rounded-xl flex flex-col items-center justify-center">
-          <div class="flex items-center gap-1.5">
-            <span class="font-bold">D-1 구석 캐리어</span>
-            <span class="zone-count text-[10px] bg-slate-200/80 text-slate-600 px-1.5 py-0.5 rounded-full" data-zone="D-1">0</span>
-          </div>
-          <span class="text-[11px] text-slate-500 mt-0.5">장기 보관, 계절옷</span>
-        </div>
 
-        <!-- 3행: 침대 / 옷장 / 욕실 -->
-        <div onclick="selectZone('A-3')" id="zone-A-3" class="zone-box col-span-2 bg-slate-50 border border-slate-200 p-4 rounded-xl flex flex-col items-center justify-center">
-          <div class="flex items-center gap-1.5">
-            <span class="font-bold">A-3 침대 & 하단</span>
-            <span class="zone-count text-[10px] bg-slate-200/80 text-slate-600 px-1.5 py-0.5 rounded-full" data-zone="A-3">0</span>
+          <!-- 메탈 선반 (5층) -->
+          <div onclick="openUnitDetail('metal-rack')" id="zone-card-metal-rack" class="zone-box bg-emerald-50/50 border-2 border-emerald-200/80 p-4 rounded-xl flex items-center justify-between hover:border-emerald-500">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="font-bold text-slate-900 text-sm md:text-base flex items-center gap-1.5">
+                  <span>🗄️ 메탈 선반</span>
+                  <span class="text-[10px] bg-emerald-600 text-white px-1.5 py-0.5 rounded font-medium">5층 (5단)</span>
+                </span>
+                <span class="text-xs bg-emerald-200 text-emerald-800 px-2 py-0.5 rounded-full font-mono font-semibold" data-unit-count="metal-rack">0</span>
+              </div>
+              <p class="text-xs text-slate-600 mt-1">각 층 개별 선택 필요: 휴지/식기/수납박스 등 5단 랙</p>
+            </div>
+            <span class="text-xs font-semibold text-emerald-700 bg-white px-2.5 py-1 rounded-lg border border-emerald-200 shadow-xs">
+              5층 구조도 🔍
+            </span>
           </div>
-          <span class="text-[11px] text-slate-500 mt-0.5">침구, 하단 수납함</span>
-        </div>
-        <div onclick="selectZone('C-1')" id="zone-C-1" class="zone-box bg-slate-50 border border-slate-200 p-4 rounded-xl flex flex-col items-center justify-center">
-          <div class="flex items-center gap-1.5">
-            <span class="font-bold">C-1 붙박이 옷장</span>
-            <span class="zone-count text-[10px] bg-slate-200/80 text-slate-600 px-1.5 py-0.5 rounded-full" data-zone="C-1">0</span>
+
+          <!-- 원목 책장 (4층) -->
+          <div onclick="openUnitDetail('bookshelf')" id="zone-card-bookshelf" class="zone-box bg-amber-50/60 border-2 border-amber-200/80 p-4 rounded-xl flex items-center justify-between hover:border-amber-500">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="font-bold text-slate-900 text-sm md:text-base flex items-center gap-1.5">
+                  <span>📚 원목 책장</span>
+                  <span class="text-[10px] bg-amber-600 text-white px-1.5 py-0.5 rounded font-medium">4층 (4단)</span>
+                </span>
+                <span class="text-xs bg-amber-200 text-amber-800 px-2 py-0.5 rounded-full font-mono font-semibold" data-unit-count="bookshelf">0</span>
+              </div>
+              <p class="text-xs text-slate-600 mt-1">전자기기 부자재, 가방, 전공 서적, 서류철 4단 책장</p>
+            </div>
+            <span class="text-xs font-semibold text-amber-700 bg-white px-2.5 py-1 rounded-lg border border-amber-200 shadow-xs">
+              4층 구조도 🔍
+            </span>
           </div>
-          <span class="text-[11px] text-slate-500 mt-0.5">행거 의류, 바구니</span>
-        </div>
-        <div onclick="selectZone('E-1')" id="zone-E-1" class="zone-box bg-slate-50 border border-slate-200 p-4 rounded-xl flex flex-col items-center justify-center">
-          <div class="flex items-center gap-1.5">
-            <span class="font-bold">E-1 욕실 수납함</span>
-            <span class="zone-count text-[10px] bg-slate-200/80 text-slate-600 px-1.5 py-0.5 rounded-full" data-zone="E-1">0</span>
+
+          <!-- 옷장 (사진 2 & 3: 좌측 행거장 + 우측 와이어 바구니 타워) -->
+          <div onclick="openUnitDetail('closet')" id="zone-card-closet" class="zone-box bg-indigo-50/60 border-2 border-indigo-200/80 p-4 rounded-xl flex items-center justify-between hover:border-indigo-500">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="font-bold text-slate-900 text-sm md:text-base flex items-center gap-1.5">
+                  <span>🚪 붙박이 옷장</span>
+                  <span class="text-[10px] bg-indigo-600 text-white px-1.5 py-0.5 rounded font-medium">좌/우 2단 분할</span>
+                </span>
+                <span class="text-xs bg-indigo-200 text-indigo-800 px-2 py-0.5 rounded-full font-mono font-semibold" data-unit-count="closet">0</span>
+              </div>
+              <p class="text-xs text-slate-600 mt-1">좌측: 메인 행거 & 하단 선반 / 우측: 와이어 바구니 & 수납 타워</p>
+            </div>
+            <span class="text-xs font-semibold text-indigo-700 bg-white px-2.5 py-1 rounded-lg border border-indigo-200 shadow-xs">
+              옷장 구조도 🔍
+            </span>
           </div>
-          <span class="text-[11px] text-slate-500 mt-0.5">세면도구, 칫솔</span>
         </div>
+      </div>
+    </section>
+
+    <!-- 2. 가구별 드릴다운 세부 구조도 뷰 (동적 렌더링 컨테이너) -->
+    <section id="unit-detail-section" class="hidden bg-white p-5 sm:p-6 rounded-2xl shadow-sm border border-slate-200 transition-all">
+      <div class="flex flex-wrap items-center justify-between gap-3 pb-3 mb-4 border-b border-slate-100">
+        <div>
+          <h2 id="detail-unit-title" class="text-lg font-bold text-slate-900 flex items-center gap-2">
+            <!-- 자바스크립트로 가구명 삽입 -->
+          </h2>
+          <p id="detail-unit-desc" class="text-xs text-slate-500 mt-0.5">
+            <!-- 가구 설명 삽입 -->
+          </p>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="viewAllInCurrentUnit()" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-lg font-medium transition">
+            이 가구 전체 보기
+          </button>
+          <button onclick="resetToRoomView()" class="text-xs bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 px-3 py-1.5 rounded-lg font-medium transition">
+            ← 방 평면도로
+          </button>
+        </div>
+      </div>
+
+      <!-- 세부 구조도 시각화 그래픽 영역 -->
+      <div id="unit-schematic-container">
+        <!-- 메탈선반 5층, 책장 4층, 옷장 좌/우, 화장실 미러장 등 렌더링 -->
       </div>
     </section>
 
     <!-- 검색창 -->
     <div class="relative">
-      <input type="text" id="search-input" oninput="handleSearch()" placeholder="물건 이름, 태그, 구역 검색 (예: 케이블, 약, A-1)..." 
-             class="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm pl-10">
-      <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm">🔍</span>
-      <button id="clear-search-btn" onclick="clearSearch()" class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-400 hover:text-slate-600 bg-slate-100 hover:bg-slate-200 px-2 py-1 rounded-md transition">
+      <input type="text" id="search-input" oninput="handleSearch()" placeholder="물건 이름, 세부 층, 태그 검색 (예: 휴지, 냄비, 메탈선반 3층, 행거, 양말)..." 
+             class="w-full px-4 py-3.5 bg-white border border-slate-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm pl-11">
+      <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-base">🔍</span>
+      <button id="clear-search-btn" onclick="clearSearch()" class="hidden absolute right-3.5 top-1/2 -translate-y-1/2 text-xs text-slate-400 hover:text-slate-600 bg-slate-100 hover:bg-slate-200 px-2.5 py-1 rounded-md transition">
         지우기
       </button>
     </div>
@@ -166,72 +311,242 @@
     <section>
       <div class="flex justify-between items-center mb-3">
         <div class="flex items-center gap-2">
-          <h3 class="text-sm font-semibold text-slate-700">보관된 아이템 목록 (<span id="item-count">0</span>)</h3>
-          <span class="text-xs text-slate-400 hidden sm:inline">· 카드를 클릭하면 지도에서 위치가 강조됩니다</span>
+          <h3 class="text-sm font-bold text-slate-700">보관된 물건 목록 (<span id="item-count">0</span>)</h3>
+          <span class="text-xs text-slate-400 hidden sm:inline">· 카드를 클릭하면 해당 층/칸 구조도로 자동 이동 및 강조됩니다</span>
         </div>
+        <button onclick="resetToRoomView()" class="text-xs text-blue-600 hover:underline">
+          초기화
+        </button>
       </div>
+
       <div id="item-list" class="grid grid-cols-1 md:grid-cols-2 gap-3">
         <!-- 자바스크립트로 렌더링 -->
       </div>
     </section>
   </div>
 
-  <!-- 물건 등록 모달 -->
+  <!-- 물건 등록/수정 모달 -->
   <div id="add-modal" class="fixed inset-0 z-50 hidden bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl border border-slate-200 shadow-2xl max-w-md w-full p-5 space-y-4">
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-2xl max-w-md w-full p-5 sm:p-6 space-y-4">
       <div class="flex justify-between items-center pb-2 border-b border-slate-100">
         <h3 class="text-base font-bold text-slate-800">새 물건 등록</h3>
         <button onclick="closeAddModal()" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg">✕</button>
       </div>
-      <form id="add-form" onsubmit="handleAddItem(event)" class="space-y-3 text-sm">
+      <form id="add-form" onsubmit="handleAddItem(event)" class="space-y-3.5 text-sm">
         <div>
           <label class="block text-xs font-semibold text-slate-600 mb-1">물건 이름 *</label>
-          <input type="text" id="modal-name" required placeholder="예: 비상약 키트, 충전기" class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <input type="text" id="modal-name" required placeholder="예: 전기포트, 룸스프레이, 전공책" class="w-full px-3 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500">
         </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">보관 가구 *</label>
+            <select id="modal-unit" required onchange="handleModalUnitChange()" class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
+              <option value="metal-rack">메탈 선반 (5층)</option>
+              <option value="bookshelf">원목 책장 (4층)</option>
+              <option value="closet">붙박이 옷장</option>
+              <option value="bathroom">화장실 수납함</option>
+              <option value="desk">A-1 책상</option>
+              <option value="side-table">A-2 원형 협탁</option>
+              <option value="etc">기타 등등 (캐리어)</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">세부 층 / 칸 *</label>
+            <select id="modal-slot" required class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
+              <!-- 단위 선택 시 자바스크립트로 동적 옵션 생성 -->
+            </select>
+          </div>
+        </div>
+
         <div>
-          <label class="block text-xs font-semibold text-slate-600 mb-1">보관 구역 *</label>
-          <select id="modal-zone" required class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
-            <option value="A-1">A-1 책상 (노트북, 스탠드, 필기구)</option>
-            <option value="A-2">A-2 원형 협탁 (안경, 충전기)</option>
-            <option value="A-3">A-3 침대 & 하단 (침구, 하단 수납함)</option>
-            <option value="B-1">B-1 메탈 선반 (식기, 휴지, 박스)</option>
-            <option value="B-2">B-2 원목 책장 (책, 전자기기 부자재)</option>
-            <option value="C-1">C-1 붙박이 옷장 (행거 의류, 바구니)</option>
-            <option value="D-1">D-1 구석 캐리어 (장기 보관, 계절옷)</option>
-            <option value="E-1">E-1 욕실 수납함 (세면도구, 칫솔)</option>
-          </select>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">세부 메모 / 위치 팁</label>
+          <input type="text" id="modal-desc" placeholder="예: 좌측 모서리 뒤편, 흰색 파우치 안" class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500">
         </div>
-        <div>
-          <label class="block text-xs font-semibold text-slate-600 mb-1">세부 위치 / 메모</label>
-          <input type="text" id="modal-desc" placeholder="예: 책상 우측 1단 서랍 내부" class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500">
-        </div>
+
         <div>
           <label class="block text-xs font-semibold text-slate-600 mb-1">태그 (쉼표로 구분)</label>
-          <input type="text" id="modal-tags" placeholder="예: 생필품, 건강, 비상" class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <input type="text" id="modal-tags" placeholder="예: 주방, 요리, 생필품" class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500">
         </div>
+
         <div class="flex justify-end gap-2 pt-2">
-          <button type="button" onclick="closeAddModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl text-xs font-medium transition">취소</button>
-          <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-medium transition shadow-sm">등록하기</button>
+          <button type="button" onclick="closeAddModal()" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl text-xs font-medium transition">취소</button>
+          <button type="submit" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-semibold transition shadow-sm">등록 완료</button>
         </div>
       </form>
     </div>
   </div>
 
   <script>
+    // ==========================================
+    // 1. 가구 및 세부 층/칸(Slot) 메타데이터 정의
+    // ==========================================
+    const STORAGE_UNITS = {
+      'metal-rack': {
+        id: 'metal-rack',
+        name: '메탈 선반',
+        icon: '🗄️',
+        desc: '주방 식기, 생필품, 수납박스를 보관하는 5단 메탈 랙 (사진 5 반영)',
+        slots: [
+          { id: 'metal-5', name: '5층 (최상단)', sub: '두루마리 휴지, 키친타월, 대형 생필품' },
+          { id: 'metal-4', name: '4층 선반', sub: '여분 수납함, 소품' },
+          { id: 'metal-3', name: '3층 선반', sub: '조리도구, 식기류, 냄비, 프라이팬' },
+          { id: 'metal-2', name: '2층 선반', sub: '화이트 패브릭 수납 박스 2개' },
+          { id: 'metal-1', name: '1층 (최하단)', sub: '택배 박스 및 대형 수납 박스' }
+        ]
+      },
+      'bookshelf': {
+        id: 'bookshelf',
+        name: '원목 책장',
+        icon: '📚',
+        desc: '책, 가방, 전자기기 부자재를 보관하는 4단 원목 책장 (사진 5 반영)',
+        slots: [
+          { id: 'bookshelf-4', name: '4층 (최상단)', sub: '전자기기 소품, 스탠드 용품' },
+          { id: 'bookshelf-3', name: '3층 선반', sub: '외출용 가방, 파우치' },
+          { id: 'bookshelf-2', name: '2층 선반', sub: '전공 서적, 교재, 강의 노트' },
+          { id: 'bookshelf-1', name: '1층 (최하단)', sub: '서류철, 케이블 박스, 수납함' }
+        ]
+      },
+      'closet': {
+        id: 'closet',
+        name: '붙박이 옷장',
+        icon: '🚪',
+        desc: '좌측 메인 행거/선반장(사진 2)과 우측 와이어 바구니 & 멀티 수납타워(사진 3)',
+        sections: [
+          {
+            title: '옷장 좌측장 (사진 2 - 메인 행거 & 선반)',
+            slots: [
+              { id: 'closet-L-top', name: '좌측 상단 선반', sub: '계절 모자, 가방, 보관 침구' },
+              { id: 'closet-L-hanger', name: '좌측 메인 행거', sub: '외투, 겨울 패딩, 셔츠, 후드집업 옷걸이' },
+              { id: 'closet-L-shelf1', name: '좌측 하단 선반 1단', sub: '접은 의류, 보관 비닐팩' },
+              { id: 'closet-L-shelf2', name: '좌측 하단 선반 2단 (바닥)', sub: '바닥 보관 공간' }
+            ]
+          },
+          {
+            title: '옷장 우측장 1열 (사진 3 - 와이어 바구니 타워)',
+            slots: [
+              { id: 'closet-R-T1-top', name: '1열 상단 선반', sub: '개어둔 의류/바지' },
+              { id: 'closet-R-T1-b1', name: '1열 와이어 바구니 1호', sub: '청바지, 티셔츠' },
+              { id: 'closet-R-T1-mid', name: '1열 중간 선반', sub: '의류 파우치, 소품' },
+              { id: 'closet-R-T1-b2', name: '1열 와이어 바구니 2호', sub: '양말, 속옷, 이너웨어' },
+              { id: 'closet-R-T1-b3', name: '1열 와이어 바구니 3호', sub: '의류 잡화, 소품' },
+              { id: 'closet-R-T1-bot', name: '1열 하단 바구니', sub: '세탁 바구니/대형 잡화' }
+            ]
+          },
+          {
+            title: '옷장 우측장 2열 (사진 3 - 선반 & 미니 타워)',
+            slots: [
+              { id: 'closet-R-T2-top', name: '2열 상단 선반/미니행거', sub: '상단 수납' },
+              { id: 'closet-R-T2-s1', name: '2열 중간 선반 1단', sub: '접은 옷' },
+              { id: 'closet-R-T2-s2', name: '2열 중간 선반 2단', sub: '잡화 소품' },
+              { id: 'closet-R-T2-b', name: '2열 중간 와이어 바구니', sub: '바구니 수납' },
+              { id: 'closet-R-T2-bot', name: '2열 바닥 공간', sub: 'IKEA 쇼핑백, 대형 보관 짐' }
+            ]
+          }
+        ]
+      },
+      'bathroom': {
+        id: 'bathroom',
+        name: '화장실 수납함',
+        icon: '🚿',
+        desc: '욕실 거울 3단 수납장 및 세면대 주변 공간 (사진 4 반영)',
+        slots: [
+          { id: 'bath-mirror-top', name: '거울 수납장 1단 (상단)', sub: '여분 세면도구, 샴푸 리필' },
+          { id: 'bath-mirror-mid', name: '거울 수납장 2단 (중단)', sub: '스킨, 로션, 선크림, 화장품' },
+          { id: 'bath-mirror-bot', name: '거울 수납장 3단 (하단)', sub: '칫솔, 치약, 면도기, 클렌징폼' },
+          { id: 'bath-sink', name: '세면대 트레이/선반', sub: '핸드워시, 비누, 타월' }
+        ]
+      },
+      'desk': {
+        id: 'desk',
+        name: 'A-1 책상',
+        icon: '💻',
+        desc: '책상 상판 및 작업 영역',
+        slots: [
+          { id: 'desk-top', name: '책상 상판', sub: '노트북, 스탠드 조명, 필기구' },
+          { id: 'desk-drawer', name: '책상 서랍', sub: '문구류, 소형 전자기기' }
+        ]
+      },
+      'side-table': {
+        id: 'side-table',
+        name: 'A-2 원형 협탁',
+        icon: '☕',
+        desc: '침대 머리맡 원형 협탁',
+        slots: [
+          { id: 'side-table-top', name: '원형 협탁 상단', sub: '안경, 스마트폰 충전기 케이블' }
+        ]
+      },
+      'etc': {
+        id: 'etc',
+        name: '기타 등등',
+        icon: '🧳',
+        desc: '캐리어 및 구석 여분 보관 공간',
+        slots: [
+          { id: 'etc-carrier', name: '대형 캐리어 내부', sub: '계절 지난 옷, 장기 보관 짐' },
+          { id: 'etc-corner', name: '방 구석 바닥', sub: '여분 박스 등' }
+        ]
+      }
+    };
+
+    // 슬롯 ID로 정보 빠르게 찾기 위한 룩업 맵 생성
+    const SLOT_LOOKUP = {};
+    Object.values(STORAGE_UNITS).forEach(unit => {
+      if (unit.slots) {
+        unit.slots.forEach(s => {
+          SLOT_LOOKUP[s.id] = { ...s, unitId: unit.id, unitName: unit.name };
+        });
+      } else if (unit.sections) {
+        unit.sections.forEach(sec => {
+          sec.slots.forEach(s => {
+            SLOT_LOOKUP[s.id] = { ...s, unitId: unit.id, unitName: unit.name, sectionTitle: sec.title };
+          });
+        });
+      }
+    });
+
+    // ==========================================
+    // 2. 초기 물건 데이터 (사진 2,3,4,5 실제 물품 반영)
+    // ==========================================
     const INITIAL_ITEMS = [
-      { id: 1, name: "노트북 & 충전 어댑터", zone: "A-1", tags: ["전자기기", "학습", "작업"], desc: "책상 위" },
-      { id: 2, name: "데스크 스탠드 조명", zone: "A-1", tags: ["조명", "책상"], desc: "책상 우측 모서리" },
-      { id: 3, name: "안경 및 스마트폰 충전 케이블", zone: "A-2", tags: ["안경", "충전기", "수면"], desc: "침대 옆 원형 협탁 상단" },
-      { id: 4, name: "식기류 및 프라이팬", zone: "B-1", tags: ["주방", "요리", "냄비"], desc: "메탈 랙 2~3단" },
-      { id: 5, name: "두루마리 휴지 & 키친타월", zone: "B-1", tags: ["생필품", "청소"], desc: "메탈 랙 상단 선반" },
-      { id: 6, name: "전공 서적 및 노트", zone: "B-2", tags: ["책", "물리", "공부"], desc: "원목 책장 1~2단" },
-      { id: 7, name: "외투 및 후드집업", zone: "C-1", tags: ["옷", "패딩", "행거"], desc: "옷장 메인 행거" },
-      { id: 8, name: "양말 및 이너웨어", zone: "C-1", tags: ["의류", "속옷"], desc: "옷장 좌측 와이어 바구니" },
-      { id: 9, name: "계절 지난 옷 & 여분 짐", zone: "D-1", tags: ["캐리어", "보관"], desc: "책장 옆 대형 캐리어 안" },
-      { id: 10, name: "칫솔, 치약, 면도기", zone: "E-1", tags: ["욕실", "세면도구", "위생"], desc: "욕실 거울 수납장 내부" }
+      // 메탈 선반 (5층)
+      { id: 101, name: "두루마리 휴지 & 키친타월", unitId: "metal-rack", slotId: "metal-5", tags: ["생필품", "청소"], desc: "메탈 선반 5층 (최상단)" },
+      { id: 102, name: "여분 수납함 & 소품 용기", unitId: "metal-rack", slotId: "metal-4", tags: ["수납", "잡화"], desc: "메탈 선반 4층" },
+      { id: 103, name: "식기류 & 프라이팬, 냄비", unitId: "metal-rack", slotId: "metal-3", tags: ["주방", "요리", "냄비"], desc: "메탈 선반 3층 조리선반" },
+      { id: 104, name: "화이트 패브릭 수납 박스 2개", unitId: "metal-rack", slotId: "metal-2", tags: ["수납함", "정리"], desc: "메탈 선반 2층 패브릭함 내부" },
+      { id: 105, name: "택배 박스 및 대형 보관함", unitId: "metal-rack", slotId: "metal-1", tags: ["박스", "대형보관"], desc: "메탈 선반 1층 (바닥)" },
+
+      // 원목 책장 (4층)
+      { id: 201, name: "전자기기 부자재 & 스탠드 용품", unitId: "bookshelf", slotId: "bookshelf-4", tags: ["전자기기", "케이블"], desc: "원목 책장 4층 (최상단)" },
+      { id: 202, name: "외출용 가방 & 파우치", unitId: "bookshelf", slotId: "bookshelf-3", tags: ["가방", "외출"], desc: "원목 책장 3층" },
+      { id: 203, name: "전공 서적 및 강의 노트", unitId: "bookshelf", slotId: "bookshelf-2", tags: ["책", "공부", "전공"], desc: "원목 책장 2층" },
+      { id: 204, name: "서류철 & 케이블 수납함", unitId: "bookshelf", slotId: "bookshelf-1", tags: ["서류", "정리함"], desc: "원목 책장 1층 (하단)" },
+
+      // 옷장 좌측 (사진 2)
+      { id: 301, name: "계절 모자 및 가방", unitId: "closet", slotId: "closet-L-top", tags: ["모자", "가방"], desc: "옷장 좌측장 상단 선반" },
+      { id: 302, name: "외투, 패딩, 후드집업", unitId: "closet", slotId: "closet-L-hanger", tags: ["외투", "패딩", "행거"], desc: "옷장 좌측장 메인 행거" },
+      { id: 303, name: "접은 의류 및 보관 비닐팩", unitId: "closet", slotId: "closet-L-shelf1", tags: ["옷", "보관"], desc: "옷장 좌측장 하단 선반 1단" },
+
+      // 옷장 우측 (사진 3)
+      { id: 304, name: "개어둔 티셔츠 & 청바지", unitId: "closet", slotId: "closet-R-T1-b1", tags: ["의류", "청바지"], desc: "우측장 1열 와이어 바구니 1호" },
+      { id: 305, name: "양말 및 이너웨어", unitId: "closet", slotId: "closet-R-T1-b2", tags: ["속옷", "양말"], desc: "우측장 1열 와이어 바구니 2호" },
+      { id: 306, name: "세탁 바구니 & 대형 잡화", unitId: "closet", slotId: "closet-R-T1-bot", tags: ["세탁", "바구니"], desc: "우측장 1열 최하단 바구니" },
+      { id: 307, name: "IKEA 파란 쇼핑백 & 보관 짐", unitId: "closet", slotId: "closet-R-T2-bot", tags: ["쇼핑백", "짐"], desc: "우측장 2열 바닥 공간" },
+
+      // 화장실 수납함 (사진 4)
+      { id: 401, name: "여분 세면도구 & 샴푸 리필", unitId: "bathroom", slotId: "bath-mirror-top", tags: ["욕실", "샴푸"], desc: "거울 수납장 1단 (상단)" },
+      { id: 402, name: "스킨, 로션, 선크림", unitId: "bathroom", slotId: "bath-mirror-mid", tags: ["화장품", "스킨케어"], desc: "거울 수납장 2단 (중단)" },
+      { id: 403, name: "칫솔, 치약, 면도기", unitId: "bathroom", slotId: "bath-mirror-bot", tags: ["위생", "칫솔", "면도기"], desc: "거울 수납장 3단 (하단)" },
+      { id: 404, name: "핸드워시 & 비누", unitId: "bathroom", slotId: "bath-sink", tags: ["세면대", "핸드워시"], desc: "세면대 주변 트레이" },
+
+      // 책상 & 협탁 & 기타
+      { id: 501, name: "노트북 & 충전 어댑터", unitId: "desk", slotId: "desk-top", tags: ["전자기기", "학습", "작업"], desc: "A-1 책상 위" },
+      { id: 502, name: "데스크 스탠드 조명", unitId: "desk", slotId: "desk-top", tags: ["조명", "책상"], desc: "A-1 책상 우측 모서리" },
+      { id: 503, name: "안경 및 스마트폰 충전 케이블", unitId: "side-table", slotId: "side-table-top", tags: ["안경", "충전기", "수면"], desc: "A-2 원형 협탁 상단" },
+      { id: 504, name: "계절 지난 옷 & 대형 짐", unitId: "etc", slotId: "etc-carrier", tags: ["캐리어", "장기보관"], desc: "구석 대형 캐리어 안" }
     ];
 
-    const STORAGE_KEY = 'room_inventory_items_v2';
+    const STORAGE_KEY = 'room_inventory_v3_drilldown';
 
     function loadItems() {
       try {
@@ -254,56 +569,346 @@
       }
     }
 
+    // 전역 상태
     let items = loadItems();
-    let currentZone = null;
+    let currentViewMode = 'ROOM'; // 'ROOM' or 'UNIT_DETAIL'
+    let currentUnitId = null;     // 'metal-rack', 'bookshelf', 'closet', 'bathroom' 등
+    let currentSlotId = null;     // 'metal-3', 'closet-L-hanger' 등
 
-    function updateZoneCounts() {
-      const counts = {};
-      items.forEach(item => {
-        counts[item.zone] = (counts[item.zone] || 0) + 1;
-      });
-      document.querySelectorAll(".zone-count").forEach(el => {
-        const zone = el.getAttribute("data-zone");
-        el.textContent = counts[zone] || 0;
-      });
+    // ==========================================
+    // 3. 네비게이션 & 뷰 전환 로직
+    // ==========================================
+
+    function resetToRoomView() {
+      currentViewMode = 'ROOM';
+      currentUnitId = null;
+      currentSlotId = null;
+
+      document.getElementById('room-map-section').classList.remove('hidden');
+      document.getElementById('unit-detail-section').classList.add('hidden');
+
+      // 브레드크럼 업데이트
+      document.getElementById('breadcrumb-separator').classList.add('hidden');
+      document.getElementById('breadcrumb-unit').classList.add('hidden');
+      document.getElementById('breadcrumb-slot-separator').classList.add('hidden');
+      document.getElementById('breadcrumb-slot').classList.add('hidden');
+      document.getElementById('btn-view-all-in-unit').classList.add('hidden');
+
+      // 활성화 표시 초기화
+      document.querySelectorAll('.zone-box').forEach(el => el.classList.remove('zone-active'));
+      document.getElementById('active-filter-badge').textContent = '전체 구역 표시 중';
+
+      renderItems(document.getElementById('search-input').value);
+      updateCounts();
     }
 
-    function renderItems(filterText = "", zoneFilter = null) {
-      const listContainer = document.getElementById("item-list");
-      listContainer.innerHTML = "";
+    function openUnitDetail(unitId, preselectSlotId = null) {
+      const unit = STORAGE_UNITS[unitId];
+      if (!unit) return;
 
-      const query = filterText.trim().toLowerCase();
+      currentViewMode = 'UNIT_DETAIL';
+      currentUnitId = unitId;
+      currentSlotId = preselectSlotId;
+
+      document.getElementById('room-map-section').classList.add('hidden');
+      document.getElementById('unit-detail-section').classList.remove('hidden');
+
+      // 브레드크럼 업데이트
+      document.getElementById('breadcrumb-separator').classList.remove('hidden');
+      const bUnit = document.getElementById('breadcrumb-unit');
+      bUnit.textContent = `${unit.icon} ${unit.name}`;
+      bUnit.classList.remove('hidden');
+      bUnit.onclick = () => viewAllInCurrentUnit();
+
+      document.getElementById('btn-view-all-in-unit').classList.remove('hidden');
+
+      // 세부 타이틀
+      document.getElementById('detail-unit-title').innerHTML = `
+        <span>${unit.icon} ${unit.name} 세부 구조도</span>
+        <span class="text-xs font-normal text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full">
+          총 <strong class="text-blue-600">${items.filter(i => i.unitId === unitId).length}개</strong> 보관 중
+        </span>
+      `;
+      document.getElementById('detail-unit-desc').textContent = unit.desc;
+
+      // 구조도 그래픽 렌더링
+      renderUnitSchematic(unit);
+
+      if (preselectSlotId) {
+        selectSlot(unitId, preselectSlotId, false);
+      } else {
+        viewAllInCurrentUnit();
+      }
+
+      // 화면 스크롤 부드럽게
+      document.getElementById('unit-detail-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function viewAllInCurrentUnit() {
+      currentSlotId = null;
+      document.querySelectorAll('.slot-box').forEach(el => el.classList.remove('slot-active'));
+      document.getElementById('breadcrumb-slot-separator').classList.add('hidden');
+      document.getElementById('breadcrumb-slot').classList.add('hidden');
+
+      const unit = STORAGE_UNITS[currentUnitId];
+      document.getElementById('active-filter-badge').textContent = `${unit.name} 전체 보기`;
+      renderItems(document.getElementById('search-input').value, currentUnitId, null);
+    }
+
+    function selectSlot(unitId, slotId, switchToDetail = true) {
+      const slotInfo = SLOT_LOOKUP[slotId];
+      if (!slotInfo) return;
+
+      // 만약 메탈선반, 책장, 옷장, 화장실처럼 세부 구조도가 있는 가구인데 현재 방 평면도라면 세부 구조도로 전환
+      if (switchToDetail && ['metal-rack', 'bookshelf', 'closet', 'bathroom'].includes(unitId) && currentViewMode !== 'UNIT_DETAIL') {
+        openUnitDetail(unitId, slotId);
+        return;
+      }
+
+      currentUnitId = unitId;
+      currentSlotId = slotId;
+
+      // 슬롯 활성화 스타일
+      document.querySelectorAll('.slot-box').forEach(el => el.classList.remove('slot-active'));
+      const activeEl = document.getElementById(`slot-card-${slotId}`);
+      if (activeEl) {
+        activeEl.classList.add('slot-active');
+        highlightSlotAnimation(slotId);
+      }
+
+      // 평면도 구역 카드 활성화
+      document.querySelectorAll('.zone-box').forEach(el => el.classList.remove('zone-active'));
+      const zoneCard = document.getElementById(`zone-card-${unitId}`);
+      if (zoneCard) zoneCard.classList.add('zone-active');
+
+      // 브레드크럼 업데이트
+      if (currentViewMode === 'UNIT_DETAIL') {
+        document.getElementById('breadcrumb-slot-separator').classList.remove('hidden');
+        const bSlot = document.getElementById('breadcrumb-slot');
+        bSlot.textContent = slotInfo.name;
+        bSlot.classList.remove('hidden');
+      }
+
+      document.getElementById('active-filter-badge').textContent = `${slotInfo.unitName} > ${slotInfo.name} 선택됨`;
+      renderItems(document.getElementById('search-input').value, unitId, slotId);
+    }
+
+    function highlightSlotAnimation(slotId) {
+      const el = document.getElementById(`slot-card-${slotId}`);
+      if (!el) return;
+      el.classList.remove('slot-highlight');
+      void el.offsetWidth;
+      el.classList.add('slot-highlight');
+    }
+
+    // ==========================================
+    // 4. 가구별 세부 구조도 시각화 그래픽 생성
+    // ==========================================
+    function renderUnitSchematic(unit) {
+      const container = document.getElementById('unit-schematic-container');
+      container.innerHTML = '';
+
+      if (unit.id === 'metal-rack') {
+        // 메탈 선반: 5층 그래픽 (위에서 아래로 5층 -> 1층)
+        const wrapper = document.createElement('div');
+        wrapper.className = 'bg-slate-100/70 p-4 rounded-2xl border border-slate-300 space-y-2.5 max-w-2xl mx-auto';
+        wrapper.innerHTML = `
+          <div class="flex items-center justify-between text-xs font-semibold text-slate-500 pb-1 border-b border-slate-200">
+            <span>[ 5단 메탈 랙 구조도 — 사진 5 반영 ]</span>
+            <span>층을 클릭하면 해당 층 물건만 필터링</span>
+          </div>
+        `;
+
+        unit.slots.forEach(slot => {
+          const count = items.filter(i => i.slotId === slot.id).length;
+          const slotDiv = document.createElement('div');
+          slotDiv.id = `slot-card-${slot.id}`;
+          slotDiv.className = `slot-box bg-white border-2 border-slate-200 rounded-xl p-3 flex items-center justify-between shadow-xs ${currentSlotId === slot.id ? 'slot-active' : ''}`;
+          slotDiv.onclick = () => selectSlot(unit.id, slot.id, false);
+          slotDiv.innerHTML = `
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-700 font-bold flex items-center justify-center text-xs">
+                ${slot.name.slice(0, 2)}
+              </div>
+              <div>
+                <div class="font-bold text-slate-800 text-sm">${slot.name}</div>
+                <div class="text-xs text-slate-500">${slot.sub}</div>
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="text-xs bg-slate-100 font-semibold px-2 py-1 rounded-full text-slate-600">${count}개</span>
+              <span class="text-xs text-blue-600 font-medium">선택</span>
+            </div>
+          `;
+          wrapper.appendChild(slotDiv);
+        });
+        container.appendChild(wrapper);
+
+      } else if (unit.id === 'bookshelf') {
+        // 원목 책장: 4층 그래픽 (4층 -> 1층)
+        const wrapper = document.createElement('div');
+        wrapper.className = 'bg-amber-50/70 p-4 rounded-2xl border border-amber-200 space-y-2.5 max-w-2xl mx-auto';
+        wrapper.innerHTML = `
+          <div class="flex items-center justify-between text-xs font-semibold text-amber-800 pb-1 border-b border-amber-200">
+            <span>[ 4단 원목 책장 구조도 — 사진 5 반영 ]</span>
+            <span>층을 클릭하면 해당 층 물건만 필터링</span>
+          </div>
+        `;
+
+        unit.slots.forEach(slot => {
+          const count = items.filter(i => i.slotId === slot.id).length;
+          const slotDiv = document.createElement('div');
+          slotDiv.id = `slot-card-${slot.id}`;
+          slotDiv.className = `slot-box bg-white border-2 border-amber-200 rounded-xl p-3 flex items-center justify-between shadow-xs ${currentSlotId === slot.id ? 'slot-active' : ''}`;
+          slotDiv.onclick = () => selectSlot(unit.id, slot.id, false);
+          slotDiv.innerHTML = `
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 rounded-lg bg-amber-100 text-amber-800 font-bold flex items-center justify-center text-xs">
+                ${slot.name.slice(0, 2)}
+              </div>
+              <div>
+                <div class="font-bold text-slate-800 text-sm">${slot.name}</div>
+                <div class="text-xs text-slate-500">${slot.sub}</div>
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="text-xs bg-amber-100 font-semibold px-2 py-1 rounded-full text-amber-800">${count}개</span>
+              <span class="text-xs text-blue-600 font-medium">선택</span>
+            </div>
+          `;
+          wrapper.appendChild(slotDiv);
+        });
+        container.appendChild(wrapper);
+
+      } else if (unit.id === 'closet') {
+        // 옷장: 사진 2(좌측장)와 사진 3(우측장 2타워)를 나란히 배치
+        const grid = document.createElement('div');
+        grid.className = 'grid grid-cols-1 lg:grid-cols-3 gap-4';
+
+        unit.sections.forEach((sec, idx) => {
+          const col = document.createElement('div');
+          col.className = 'bg-slate-50 border border-slate-200 rounded-2xl p-4 flex flex-col justify-between space-y-2.5';
+          col.innerHTML = `
+            <div class="text-xs font-bold text-indigo-700 pb-1.5 border-b border-slate-200 flex items-center justify-between">
+              <span>${sec.title}</span>
+            </div>
+          `;
+
+          const slotsContainer = document.createElement('div');
+          slotsContainer.className = 'space-y-2';
+
+          sec.slots.forEach(slot => {
+            const count = items.filter(i => i.slotId === slot.id).length;
+            const slotDiv = document.createElement('div');
+            slotDiv.id = `slot-card-${slot.id}`;
+            slotDiv.className = `slot-box bg-white border border-slate-200 rounded-xl p-2.5 flex items-center justify-between text-xs shadow-2xs ${currentSlotId === slot.id ? 'slot-active' : ''}`;
+            slotDiv.onclick = () => selectSlot(unit.id, slot.id, false);
+            slotDiv.innerHTML = `
+              <div>
+                <div class="font-bold text-slate-800">${slot.name}</div>
+                <div class="text-[11px] text-slate-500 mt-0.5">${slot.sub}</div>
+              </div>
+              <span class="bg-indigo-50 text-indigo-700 font-semibold px-1.5 py-0.5 rounded text-[11px]">${count}개</span>
+            `;
+            slotsContainer.appendChild(slotDiv);
+          });
+
+          col.appendChild(slotsContainer);
+          grid.appendChild(col);
+        });
+
+        container.appendChild(grid);
+
+      } else if (unit.id === 'bathroom') {
+        // 화장실 수납함: 사진 4 반영 (3단 미러장 + 세면대 트레이)
+        const wrapper = document.createElement('div');
+        wrapper.className = 'bg-blue-50/50 p-4 rounded-2xl border border-blue-200 max-w-2xl mx-auto space-y-3';
+        wrapper.innerHTML = `
+          <div class="flex items-center justify-between text-xs font-semibold text-blue-800 pb-1 border-b border-blue-200">
+            <span>[ 화장실 거울 수납장 & 세면대 트레이 — 사진 4 반영 ]</span>
+            <span>칸을 클릭하면 해당 위치 물건만 필터링</span>
+          </div>
+        `;
+
+        unit.slots.forEach(slot => {
+          const count = items.filter(i => i.slotId === slot.id).length;
+          const slotDiv = document.createElement('div');
+          slotDiv.id = `slot-card-${slot.id}`;
+          slotDiv.className = `slot-box bg-white border-2 border-blue-100 rounded-xl p-3 flex items-center justify-between shadow-xs ${currentSlotId === slot.id ? 'slot-active' : ''}`;
+          slotDiv.onclick = () => selectSlot(unit.id, slot.id, false);
+          slotDiv.innerHTML = `
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 rounded-lg bg-blue-100 text-blue-700 font-bold flex items-center justify-center text-xs">
+                ${slot.name.includes('거울') ? '미러' : '트레이'}
+              </div>
+              <div>
+                <div class="font-bold text-slate-800 text-sm">${slot.name}</div>
+                <div class="text-xs text-slate-500">${slot.sub}</div>
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="text-xs bg-blue-100 font-semibold px-2 py-1 rounded-full text-blue-800">${count}개</span>
+              <span class="text-xs text-blue-600 font-medium">선택</span>
+            </div>
+          `;
+          wrapper.appendChild(slotDiv);
+        });
+        container.appendChild(wrapper);
+      }
+    }
+
+    // ==========================================
+    // 5. 물건 목록 렌더링 & 검색 필터링
+    // ==========================================
+    function renderItems(queryText = '', filterUnitId = null, filterSlotId = null) {
+      const listContainer = document.getElementById('item-list');
+      listContainer.innerHTML = '';
+
+      const q = (queryText || '').trim().toLowerCase();
+
       const filtered = items.filter(item => {
-        const matchesZone = zoneFilter ? item.zone === zoneFilter : true;
-        const matchesQuery = !query || 
-                             item.name.toLowerCase().includes(query) ||
-                             (item.tags && item.tags.some(t => t.toLowerCase().includes(query))) ||
-                             item.zone.toLowerCase().includes(query) ||
-                             (item.desc && item.desc.toLowerCase().includes(query));
-        return matchesZone && matchesQuery;
+        // 단위 필터
+        if (filterUnitId && item.unitId !== filterUnitId) return false;
+        // 세부 슬롯 필터
+        if (filterSlotId && item.slotId !== filterSlotId) return false;
+
+        // 검색어 필터
+        if (!q) return true;
+        const slotInfo = SLOT_LOOKUP[item.slotId];
+        const slotName = slotInfo ? slotInfo.name.toLowerCase() : '';
+        const unitName = slotInfo ? slotInfo.unitName.toLowerCase() : '';
+
+        const nameMatch = item.name.toLowerCase().includes(q);
+        const tagMatch = item.tags && item.tags.some(t => t.toLowerCase().includes(q));
+        const descMatch = item.desc && item.desc.toLowerCase().includes(q);
+        const locationMatch = slotName.includes(q) || unitName.includes(q);
+
+        return nameMatch || tagMatch || descMatch || locationMatch;
       });
 
-      document.getElementById("item-count").textContent = filtered.length;
+      document.getElementById('item-count').textContent = filtered.length;
 
       if (filtered.length === 0) {
         listContainer.innerHTML = `
           <div class="col-span-full py-12 text-center text-slate-400 text-sm bg-white rounded-2xl border border-dashed border-slate-200">
-            <div class="text-2xl mb-1">📦</div>
-            <div>해당 조건에 맞는 물건이 없습니다.</div>
-            <button onclick="resetFilter()" class="mt-3 text-xs text-blue-600 hover:underline">전체 목록 보기</button>
+            <div class="text-3xl mb-2">🔍</div>
+            <div class="font-medium text-slate-600">조건에 맞는 물건이 없습니다.</div>
+            <button onclick="resetToRoomView()" class="mt-3 text-xs bg-blue-50 text-blue-600 px-3 py-1.5 rounded-lg hover:bg-blue-100 transition font-medium">전체 목록 보기</button>
           </div>
         `;
         return;
       }
 
       filtered.forEach(item => {
-        const card = document.createElement("div");
-        card.className = "item-card bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between group";
-        card.setAttribute("data-id", item.id);
+        const slotInfo = SLOT_LOOKUP[item.slotId] || { name: '위치 미정', unitName: '기타' };
+        const card = document.createElement('div');
+        card.className = 'item-card bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between group';
+        card.setAttribute('data-id', item.id);
+
+        // 카드 클릭 시 해당 슬롯/가구로 바로 이동 및 하이라이트
         card.onclick = (e) => {
-          // 태그나 버튼 클릭 시 카드 전체 클릭 이벤트 버블링 방지
-          if (e.target.closest('button') || e.target.closest('.tag-chip') || e.target.closest('.zone-badge-btn')) return;
-          highlightZone(item.zone);
+          if (e.target.closest('button')) return;
+          focusOnItem(item);
         };
 
         const tagsHtml = (item.tags || []).map(t => 
@@ -312,21 +917,19 @@
 
         card.innerHTML = `
           <div>
-            <div class="flex items-center justify-between">
-              <button type="button" onclick="selectZone('${item.zone}')" class="zone-badge-btn text-xs font-semibold px-2 py-0.5 rounded bg-blue-100 hover:bg-blue-200 text-blue-700 font-mono transition cursor-pointer" title="이 구역만 보기">
-                ${item.zone}
+            <div class="flex items-center justify-between gap-1">
+              <button type="button" onclick="focusOnItemById(${item.id})" class="text-xs font-semibold px-2 py-0.5 rounded bg-blue-100 hover:bg-blue-200 text-blue-700 transition cursor-pointer flex items-center gap-1" title="해당 층 구조도로 이동">
+                <span>📍 ${slotInfo.unitName} &gt; ${slotInfo.name}</span>
               </button>
-              <div class="flex items-center gap-1.5">
-                <span class="text-xs text-slate-400">${item.desc || ""}</span>
-                <button type="button" onclick="deleteItem(${item.id})" class="opacity-0 group-hover:opacity-100 text-slate-300 hover:text-red-500 p-1 text-xs transition" title="물건 삭제">✕</button>
-              </div>
+              <button type="button" onclick="deleteItem(${item.id})" class="opacity-0 group-hover:opacity-100 text-slate-300 hover:text-red-500 p-1 text-xs transition" title="물건 삭제">✕</button>
             </div>
-            <h4 class="text-base font-semibold text-slate-800 mt-2 hover:text-blue-600 transition flex items-center justify-between">
+            <h4 class="text-base font-semibold text-slate-800 mt-2.5 flex items-center justify-between group-hover:text-blue-600 transition">
               <span>${item.name}</span>
-              <span class="text-[11px] text-blue-500 opacity-0 group-hover:opacity-100 transition font-normal">지도 위치 보기 ↗</span>
+              <span class="text-[11px] text-blue-500 opacity-0 group-hover:opacity-100 transition font-normal">위치 보기 ↗</span>
             </h4>
+            <p class="text-xs text-slate-400 mt-1">${item.desc || ""}</p>
           </div>
-          <div class="flex flex-wrap gap-1 mt-3">
+          <div class="flex flex-wrap gap-1 mt-3 pt-2 border-t border-slate-100">
             ${tagsHtml}
           </div>
         `;
@@ -334,138 +937,161 @@
       });
     }
 
-    function selectZone(zoneId) {
-      if (currentZone === zoneId) {
-        resetFilter();
-        return;
-      }
-
-      currentZone = zoneId;
-      document.querySelectorAll(".zone-box").forEach(el => el.classList.remove("zone-active"));
-
-      const targetBox = document.getElementById(`zone-${zoneId}`);
-      if (targetBox) {
-        targetBox.classList.add("zone-active");
-        highlightZone(zoneId, false);
-      }
-
-      const zoneNames = {
-        'A-1': 'A-1 책상',
-        'A-2': 'A-2 원형 협탁',
-        'A-3': 'A-3 침대 & 하단',
-        'B-1': 'B-1 메탈 선반',
-        'B-2': 'B-2 원목 책장',
-        'C-1': 'C-1 붙박이 옷장',
-        'D-1': 'D-1 구석 캐리어',
-        'E-1': 'E-1 욕실 수납함'
-      };
-
-      document.getElementById("active-zone-label").textContent = `${zoneNames[zoneId] || zoneId} 선택됨 (클릭 시 해제)`;
-      renderItems(document.getElementById("search-input").value, currentZone);
-    }
-
-    function highlightZone(zoneId, filterIfDifferent = true) {
-      const targetBox = document.getElementById(`zone-${zoneId}`);
-      if (!targetBox) return;
-
-      targetBox.classList.remove("zone-highlight");
-      // 강제 리플로우로 애니메이션 재실행
-      void targetBox.offsetWidth;
-      targetBox.classList.add("zone-highlight");
-
-      // 화면이 스크롤되어 있다면 지도 위치로 부드럽게 스크롤
-      const rect = targetBox.getBoundingClientRect();
-      if (rect.top < 0 || rect.bottom > window.innerHeight) {
-        targetBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
-
-      if (filterIfDifferent && currentZone !== zoneId) {
-        selectZone(zoneId);
-      }
-    }
-
-    function resetFilter() {
-      currentZone = null;
-      document.querySelectorAll(".zone-box").forEach(el => el.classList.remove("zone-active"));
-      document.getElementById("active-zone-label").textContent = "전체 구역 표시 중";
-      document.getElementById("search-input").value = "";
-      document.getElementById("clear-search-btn").classList.add("hidden");
-      renderItems();
-    }
-
-    function handleSearch() {
-      const q = document.getElementById("search-input").value;
-      const clearBtn = document.getElementById("clear-search-btn");
-      if (q.trim().length > 0) {
-        clearBtn.classList.remove("hidden");
+    function focusOnItem(item) {
+      if (['metal-rack', 'bookshelf', 'closet', 'bathroom'].includes(item.unitId)) {
+        openUnitDetail(item.unitId, item.slotId);
       } else {
-        clearBtn.classList.add("hidden");
+        selectSlot(item.unitId, item.slotId, false);
       }
-      renderItems(q, currentZone);
+    }
+
+    function focusOnItemById(id) {
+      const item = items.find(i => i.id === id);
+      if (item) focusOnItem(item);
+    }
+
+    function updateCounts() {
+      // 각 단위별 카운트 뱃지 갱신
+      const unitCounts = {};
+      items.forEach(item => {
+        unitCounts[item.unitId] = (unitCounts[item.unitId] || 0) + 1;
+      });
+
+      document.querySelectorAll('[data-unit-count]').forEach(el => {
+        const uId = el.getAttribute('data-unit-count');
+        el.textContent = `${unitCounts[uId] || 0}개`;
+      });
+    }
+
+    // ==========================================
+    // 6. 검색창 인터랙션
+    // ==========================================
+    function handleSearch() {
+      const q = document.getElementById('search-input').value;
+      const clearBtn = document.getElementById('clear-search-btn');
+      if (q.trim().length > 0) {
+        clearBtn.classList.remove('hidden');
+      } else {
+        clearBtn.classList.add('hidden');
+      }
+      renderItems(q, currentUnitId, currentSlotId);
     }
 
     function clearSearch() {
-      document.getElementById("search-input").value = "";
-      document.getElementById("clear-search-btn").classList.add("hidden");
-      renderItems("", currentZone);
+      document.getElementById('search-input').value = '';
+      document.getElementById('clear-search-btn').classList.add('hidden');
+      renderItems('', currentUnitId, currentSlotId);
     }
 
     function searchTag(tag) {
-      const input = document.getElementById("search-input");
+      const input = document.getElementById('search-input');
       input.value = tag;
-      document.getElementById("clear-search-btn").classList.remove("hidden");
-      renderItems(tag, currentZone);
+      document.getElementById('clear-search-btn').classList.remove('hidden');
+      renderItems(tag, currentUnitId, currentSlotId);
     }
 
     function deleteItem(id) {
       if (!confirm("이 물건을 목록에서 삭제하시겠습니까?")) return;
       items = items.filter(i => i.id !== id);
       saveItems(items);
-      updateZoneCounts();
-      renderItems(document.getElementById("search-input").value, currentZone);
+      updateCounts();
+      if (currentViewMode === 'UNIT_DETAIL' && STORAGE_UNITS[currentUnitId]) {
+        renderUnitSchematic(STORAGE_UNITS[currentUnitId]);
+      }
+      renderItems(document.getElementById('search-input').value, currentUnitId, currentSlotId);
     }
 
+    // ==========================================
+    // 7. 물건 등록 모달
+    // ==========================================
     function openAddModal() {
-      const modal = document.getElementById("add-modal");
-      if (currentZone) {
-        document.getElementById("modal-zone").value = currentZone;
+      const modal = document.getElementById('add-modal');
+      const unitSelect = document.getElementById('modal-unit');
+
+      if (currentUnitId) {
+        unitSelect.value = currentUnitId;
       }
-      modal.classList.remove("hidden");
-      document.getElementById("modal-name").focus();
+      handleModalUnitChange();
+
+      if (currentSlotId) {
+        document.getElementById('modal-slot').value = currentSlotId;
+      }
+
+      modal.classList.remove('hidden');
+      document.getElementById('modal-name').focus();
     }
 
     function closeAddModal() {
-      document.getElementById("add-modal").classList.add("hidden");
-      document.getElementById("add-form").reset();
+      document.getElementById('add-modal').classList.add('hidden');
+      document.getElementById('add-form').reset();
+    }
+
+    function handleModalUnitChange() {
+      const unitId = document.getElementById('modal-unit').value;
+      const slotSelect = document.getElementById('modal-slot');
+      slotSelect.innerHTML = '';
+
+      const unit = STORAGE_UNITS[unitId];
+      if (!unit) return;
+
+      if (unit.slots) {
+        unit.slots.forEach(s => {
+          const opt = document.createElement('option');
+          opt.value = s.id;
+          opt.textContent = `${s.name} (${s.sub})`;
+          slotSelect.appendChild(opt);
+        });
+      } else if (unit.sections) {
+        unit.sections.forEach(sec => {
+          const optGroup = document.createElement('optgroup');
+          optGroup.label = sec.title;
+          sec.slots.forEach(s => {
+            const opt = document.createElement('option');
+            opt.value = s.id;
+            opt.textContent = `${s.name} (${s.sub})`;
+            optGroup.appendChild(opt);
+          });
+          slotSelect.appendChild(optGroup);
+        });
+      }
     }
 
     function handleAddItem(e) {
       e.preventDefault();
-      const name = document.getElementById("modal-name").value.trim();
-      const zone = document.getElementById("modal-zone").value;
-      const desc = document.getElementById("modal-desc").value.trim();
-      const rawTags = document.getElementById("modal-tags").value;
-      const tags = rawTags.split(",").map(t => t.trim()).filter(Boolean);
+      const name = document.getElementById('modal-name').value.trim();
+      const unitId = document.getElementById('modal-unit').value;
+      const slotId = document.getElementById('modal-slot').value;
+      const desc = document.getElementById('modal-desc').value.trim();
+      const rawTags = document.getElementById('modal-tags').value;
+      const tags = rawTags.split(',').map(t => t.trim()).filter(Boolean);
 
       if (!name) return;
 
+      const slotInfo = SLOT_LOOKUP[slotId];
       const newItem = {
         id: Date.now(),
         name,
-        zone,
-        desc: desc || "보관 중",
-        tags: tags.length > 0 ? tags : ["기타"]
+        unitId,
+        slotId,
+        desc: desc || (slotInfo ? `${slotInfo.unitName} ${slotInfo.name}` : "보관 중"),
+        tags: tags.length > 0 ? tags : ["수납"]
       };
 
       items.unshift(newItem);
       saveItems(items);
-      updateZoneCounts();
+      updateCounts();
       closeAddModal();
-      selectZone(zone);
+
+      // 등록한 가구 및 슬롯으로 자동 전환 & 하이라이트
+      if (['metal-rack', 'bookshelf', 'closet', 'bathroom'].includes(unitId)) {
+        openUnitDetail(unitId, slotId);
+      } else {
+        selectSlot(unitId, slotId);
+      }
     }
 
-    // 초기화
-    updateZoneCounts();
+    // 초기 실행
+    updateCounts();
     renderItems();
   </script>
 </body>
