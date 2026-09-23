@@ -72,6 +72,9 @@
         <p class="text-xs md:text-sm text-slate-500 mt-1">구역을 직접 클릭하거나 검색해서 물건 위치를 확인하세요.</p>
       </div>
       <div class="flex items-center gap-2">
+        <button onclick="resetDataToDefault()" title="초기 데이터 복원" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-700 px-3 py-2 rounded-xl font-medium transition">
+          ↺ 데이터 초기화
+        </button>
         <button onclick="resetFilter()" class="text-xs bg-slate-200 hover:bg-slate-300 active:scale-95 text-slate-700 px-3.5 py-2 rounded-xl font-medium transition flex items-center gap-1.5 shadow-sm">
           <span>전체 보기</span>
         </button>
@@ -113,7 +116,7 @@
             <span class="font-bold text-slate-800">B-1 창문 앞 여분 공간</span>
             <span class="text-[11px] bg-slate-200/80 text-slate-600 px-2 py-0.5 rounded-full font-mono" data-zone-count="B-1">0</span>
           </div>
-          <span class="text-[11px] text-slate-500 mt-0.5">라디에이터 앞, 러그 공간</span>
+          <span class="text-[11px] text-slate-500 mt-0.5">밥솥, 보냉백, 박스 수납</span>
         </div>
 
         <div onclick="handleZoneClick('B-2')" id="zone-box-B-2" class="zone-box bg-slate-50 border border-slate-200 p-4 rounded-xl flex flex-col items-center justify-center">
@@ -121,7 +124,7 @@
             <span class="font-bold text-slate-800">B-2 메탈 선반 (5층)</span>
             <span class="text-[11px] bg-slate-200/80 text-slate-600 px-2 py-0.5 rounded-full font-mono" data-zone-count="B-2">0</span>
           </div>
-          <span class="text-[11px] text-slate-500 mt-0.5">식기, 휴지, 수납박스</span>
+          <span class="text-[11px] text-slate-500 mt-0.5">식기, 식품/스낵, 휴지, 카메라</span>
         </div>
 
         <!-- 2행: A-2 원형 협탁 (1칸) / 중앙 활동 공간 (2칸) / C-1 원목 책장 (1칸) -->
@@ -142,7 +145,7 @@
             <span class="font-bold text-slate-800">C-1 원목 책장 (4층)</span>
             <span class="text-[11px] bg-slate-200/80 text-slate-600 px-2 py-0.5 rounded-full font-mono" data-zone-count="C-1">0</span>
           </div>
-          <span class="text-[11px] text-slate-500 mt-0.5">책, 전자기기 부자재</span>
+          <span class="text-[11px] text-slate-500 mt-0.5">문구, 전자기기, 상비약, 생필품</span>
         </div>
 
         <!-- 3행: A-3 침대 & 하단 (2칸) / C-2 구석 캐리어 (1칸) / E-1 욕실 수납함 (1칸) -->
@@ -159,7 +162,7 @@
             <span class="font-bold text-slate-800">C-2 구석 캐리어</span>
             <span class="text-[11px] bg-slate-200/80 text-slate-600 px-2 py-0.5 rounded-full font-mono" data-zone-count="C-2">0</span>
           </div>
-          <span class="text-[11px] text-slate-500 mt-0.5">장기 보관, 계절옷</span>
+          <span class="text-[11px] text-slate-500 mt-0.5">외화/귀중품, 카드, 자전거커버</span>
         </div>
 
         <div onclick="handleZoneClick('E-1')" id="zone-box-E-1" class="zone-box bg-slate-50 border border-slate-200 p-4 rounded-xl flex flex-col items-center justify-center">
@@ -322,42 +325,43 @@
       'B-1': {
         id: 'B-1',
         name: 'B-1 창문 앞 여분 공간',
-        desc: '창문 및 라디에이터 앞 러그/바닥 공간',
+        desc: '창문 및 라디에이터 앞 공간, 우체국/헬멧/지퍼 박스',
         slots: [
-          { id: 'B-1-space', name: '창문 앞 공간' }
+          { id: 'B-1-space', name: '창문 앞 공간', sub: '밥솥, 마스크, 주방/위생용품' }
         ]
       },
       'B-2': {
         id: 'B-2',
         name: 'B-2 메탈 선반 (5층)',
-        desc: '식기, 휴지, 수납박스 등 5단 선반',
+        desc: '식기, 식품/스낵, 휴지, 카메라 등 5단 메탈 선반',
         slots: [
-          { id: 'B-2-5', name: '5층 (최상단)', sub: '휴지, 키친타월' },
-          { id: 'B-2-4', name: '4층 선반', sub: '여분 수납용기, 소품' },
-          { id: 'B-2-3', name: '3층 선반', sub: '조리도구, 식기, 냄비' },
-          { id: 'B-2-2-L', name: '2층 왼쪽 수납박스 📦', sub: '화이트 패브릭함 (좌)' },
-          { id: 'B-2-2-R', name: '2층 오른쪽 수납박스 📦', sub: '화이트 패브릭함 (우)' },
-          { id: 'B-2-1-box', name: '1층 수납박스 📦', sub: '대형 수납함 내부' },
-          { id: 'B-2-1', name: '1층 선반 (최하단)', sub: '택배 박스 및 바닥 공간' }
+          { id: 'B-2-5', name: '5층 (최상단)', sub: '휴지, 키친타올, 멀티탭, 담요' },
+          { id: 'B-2-4', name: '4층 선반', sub: '거울, 빗, 텀블러, 커피/티' },
+          { id: 'B-2-3', name: '3층 선반', sub: '식기건조대, 칼, 수저, 스낵/간식' },
+          { id: 'B-2-2', name: '2층 선반 및 측면 걸이', sub: '카메라, 삼각대, 에코백, 조리도구' },
+          { id: 'B-2-2-L', name: '2층 왼쪽 수납박스 📦', sub: '라면, 즉석밥, 스프, 누룽지' },
+          { id: 'B-2-2-R', name: '2층 오른쪽 수납박스 📦', sub: '국 블럭, 소면, 양념/장류' },
+          { id: 'B-2-1-box', name: '1층 수납박스 📦', sub: '김, 오징어채, 감자반' },
+          { id: 'B-2-1', name: '1층 선반 및 바닥', sub: '드라이기, 냄비받침, 락앤락, 구두' }
         ]
       },
       'C-1': {
         id: 'C-1',
         name: 'C-1 원목 책장 (4층)',
-        desc: '전공 서적, 가방, 전자기기 부자재 4단 책장',
+        desc: '향수/소품, 문구, 전자기기, 생필품, 상비약 4단 책장',
         slots: [
-          { id: 'C-1-4', name: '4층 (최상단)', sub: '전자기기 부자재' },
-          { id: 'C-1-3', name: '3층 선반', sub: '외출용 가방, 파우치' },
-          { id: 'C-1-2', name: '2층 선반', sub: '전공 서적, 교재' },
-          { id: 'C-1-1', name: '1층 (최하단)', sub: '서류철, 케이블함' }
+          { id: 'C-1-4', name: '4층 (최상단)', sub: '향수, 장바구니, 팔찌, 손톱깎이, 간식' },
+          { id: 'C-1-3', name: '3층 선반', sub: '문구류, 케이블, 외장하드, 키보드' },
+          { id: 'C-1-2', name: '2층 선반', sub: '물티슈, 휴지, 캡슐세제, 어댑터, 수면용품' },
+          { id: 'C-1-1', name: '1층 (최하단)', sub: '상비약, 체온계, 자물쇠, 여행용품' }
         ]
       },
       'C-2': {
         id: 'C-2',
         name: 'C-2 구석 캐리어',
-        desc: '장기 보관, 계절 옷 대형 캐리어',
+        desc: '귀중품, 외화 현금, 비상 카드, 자전거 커버',
         slots: [
-          { id: 'C-2-carrier', name: '캐리어 내부' }
+          { id: 'C-2-carrier', name: '캐리어 내부', sub: '유로화, 카드, 지갑, 증명사진, 방수커버' }
         ]
       },
       'D-1': {
@@ -401,8 +405,7 @@
     // =======================================================
     // 2. 초기 물건 데이터
     // =======================================================
-    const INITIAL_ITEMS = [
-      // A-1 책상 (18개 실제 정리 물품)
+const INITIAL_ITEMS = [
       { id: 1, name: "노트북 (LG 그램 화이트)", zone: "A-1", slotId: "A-1-top", tags: ["전자기기", "노트북", "책상"], desc: "책상 중앙 상판" },
       { id: 2, name: "태블릿 및 스타일러스 펜", zone: "A-1", slotId: "A-1-top", tags: ["전자기기", "태블릿", "책상"], desc: "노트북 앞 좌측" },
       { id: 3, name: "무선 마우스 및 마우스패드", zone: "A-1", slotId: "A-1-top", tags: ["전자기기", "주변기기", "마우스"], desc: "노트북 우측 앞" },
@@ -424,8 +427,6 @@
       { id: 19, name: "도시락 가방 (2개)", zone: "A-1", slotId: "A-1-bottom", tags: ["가방", "도시락가방", "보관함"], desc: "책상 하단 가방 보관함 내부" },
       { id: 20, name: "지퍼백 모음집", zone: "A-1", slotId: "A-1-bottom", tags: ["주방소품", "지퍼백", "소모품"], desc: "책상 하단 가방 보관함 내부" },
       { id: 21, name: "필통-소형", zone: "A-1", slotId: "A-1-top", tags: ["문구", "필통", "필기구", "책상"], desc: "책상 상판" },
-
-      // A-2 원형 협탁 (10개 실제 정리 물품)
       { id: 22, name: "군대 손목시계", zone: "A-2", slotId: "A-2-top", tags: ["시계", "외출용품", "협탁"], desc: "원형 협탁 상단" },
       { id: 23, name: "갤럭시 핏3", zone: "A-2", slotId: "A-2-top", tags: ["웨어러블", "스마트밴드", "전자기기"], desc: "원형 협탁 상단" },
       { id: 24, name: "지갑", zone: "A-2", slotId: "A-2-top", tags: ["지갑", "외출용품", "필수품"], desc: "원형 협탁 상단" },
@@ -436,35 +437,154 @@
       { id: 29, name: "자전거 열쇠 여분", zone: "A-2", slotId: "A-2-top", tags: ["열쇠", "자전거", "보비품"], desc: "원형 협탁 상단" },
       { id: 30, name: "핸드크림", zone: "A-2", slotId: "A-2-top", tags: ["보습", "핸드케어", "위생용품"], desc: "원형 협탁 상단" },
       { id: 31, name: "안경집", zone: "A-2", slotId: "A-2-top", tags: ["안경", "안경집", "보관함", "협탁"], desc: "원형 협탁 상단" },
-
-      // 기타 구역 기본 데이터
       { id: 32, name: "침구류 세트", zone: "A-3", slotId: "A-3-bed", tags: ["침구", "이불"], desc: "침대 위" },
-      { id: 33, name: "두루마리 휴지 & 키친타월", zone: "B-2", slotId: "B-2-5", tags: ["생필품", "청소"], desc: "메탈 선반 5층 (최상단)" },
-      { id: 34, name: "여분 수납함 & 소품 용기", zone: "B-2", slotId: "B-2-4", tags: ["수납", "잡화"], desc: "메탈 선반 4층" },
-      { id: 35, name: "식기류 및 프라이팬, 냄비", zone: "B-2", slotId: "B-2-3", tags: ["주방", "요리", "냄비"], desc: "메탈 선반 3층 조리선반" },
-      { id: 36, name: "화이트 패브릭 수납 박스 (왼쪽)", zone: "B-2", slotId: "B-2-2-L", tags: ["수납함", "정리"], desc: "메탈 선반 2층 왼쪽 박스 내부" },
-      { id: 37, name: "화이트 패브릭 수납 박스 (오른쪽)", zone: "B-2", slotId: "B-2-2-R", tags: ["수납함", "정리"], desc: "메탈 선반 2층 오른쪽 박스 내부" },
-      { id: 38, name: "대형 수납함 내부 보관 물품", zone: "B-2", slotId: "B-2-1-box", tags: ["수납함", "보관"], desc: "메탈 선반 1층 수납박스 내부" },
-      { id: 39, name: "택배 박스 및 바닥 공간", zone: "B-2", slotId: "B-2-1", tags: ["박스", "보관"], desc: "메탈 선반 1층 (바닥)" },
-      { id: 40, name: "전자기기 부자재 & 스탠드 용품", zone: "C-1", slotId: "C-1-4", tags: ["전자기기", "케이블"], desc: "원목 책장 4층 (최상단)" },
-      { id: 41, name: "외출용 가방 & 파우치", zone: "C-1", slotId: "C-1-3", tags: ["가방", "외출"], desc: "원목 책장 3층" },
-      { id: 42, name: "전공 서적 및 강의 노트", zone: "C-1", slotId: "C-1-2", tags: ["책", "물리", "공부"], desc: "원목 책장 2층" },
-      { id: 43, name: "서류철 & 케이블 정리함", zone: "C-1", slotId: "C-1-1", tags: ["서류", "정리함"], desc: "원목 책장 1층 (하단)" },
-      { id: 44, name: "계절 지난 옷 & 여분 짐", zone: "C-2", slotId: "C-2-carrier", tags: ["캐리어", "보관"], desc: "구석 대형 캐리어 안" },
-      { id: 45, name: "외투 및 겨울 패딩, 후드집업", zone: "D-1", slotId: "D-1-hanger", tags: ["옷", "패딩", "행거"], desc: "옷장 좌측 메인 행거" },
-      { id: 46, name: "계절 모자 및 가방", zone: "D-1", slotId: "D-1-top", tags: ["모자", "가방"], desc: "옷장 좌측 상단 선반" },
-      { id: 47, name: "접은 의류 및 보관 비닐팩", zone: "D-1", slotId: "D-1-shelf1", tags: ["의류", "보관"], desc: "옷장 좌측 하단 선반 1단" },
-      { id: 48, name: "개어둔 티셔츠 & 청바지", zone: "D-2", slotId: "D-2-T1-b1", tags: ["의류", "청바지"], desc: "우측장 1열 와이어 바구니 1호" },
-      { id: 49, name: "양말 및 속옷, 이너웨어", zone: "D-2", slotId: "D-2-T1-b2", tags: ["의류", "속옷", "양말"], desc: "우측장 1열 와이어 바구니 2호" },
-      { id: 50, name: "세탁 바구니 & 잡화", zone: "D-2", slotId: "D-2-T1-bot", tags: ["세탁", "바구니"], desc: "우측장 1열 하단 바구니" },
-      { id: 51, name: "쇼핑백 & 보관 짐", zone: "D-2", slotId: "D-2-T2-bot", tags: ["쇼핑백", "짐"], desc: "우측장 2열 바닥 공간" },
-      { id: 52, name: "여분 세면도구 & 샴푸 리필", zone: "E-1", slotId: "E-1-mirror-top", tags: ["욕실", "샴푸"], desc: "거울 수납장 1단 (상단)" },
-      { id: 53, name: "스킨, 로션, 선크림", zone: "E-1", slotId: "E-1-mirror-mid", tags: ["화장품", "스킨케어"], desc: "거울 수납장 2단 (중단)" },
-      { id: 54, name: "칫솔, 치약, 면도기", zone: "E-1", slotId: "E-1-mirror-bot", tags: ["욕실", "세면도구", "위생"], desc: "거울 수납장 3단 (하단)" },
-      { id: 55, name: "핸드워시 & 비누", zone: "E-1", slotId: "E-1-sink", tags: ["세면대", "핸드워시"], desc: "세면대 주변 트레이" }
+      { id: 33, name: "전기밥솥", zone: "B-1", slotId: "B-1-space", tags: ["주방가전", "밥솥", "우체국박스"], desc: "B-1 창문 앞 여분 공간 우체국 박스 내부" },
+      { id: 34, name: "KF-AD 마스크", zone: "B-1", slotId: "B-1-space", tags: ["위생", "마스크", "헬멧박스"], desc: "B-1 창문 앞 여분 공간 헬멧 박스 내부" },
+      { id: 35, name: "샤워실 하수구 거름망 (1개)", zone: "B-1", slotId: "B-1-space", tags: ["욕실용품", "청소", "헬멧박스"], desc: "B-1 창문 앞 여분 공간 헬멧 박스 내부" },
+      { id: 36, name: "보냉 봉투 (3개)", zone: "B-1", slotId: "B-1-space", tags: ["주방소품", "보냉백", "헬멧박스"], desc: "B-1 창문 앞 여분 공간 헬멧 박스 내부" },
+      { id: 37, name: "나무젓가락 (여분)", zone: "B-1", slotId: "B-1-space", tags: ["일회용품", "주방", "헬멧박스"], desc: "B-1 창문 앞 여분 공간 헬멧 박스 내부" },
+      { id: 38, name: "플라스틱 빨대", zone: "B-1", slotId: "B-1-space", tags: ["일회용품", "주방", "헬멧박스"], desc: "B-1 창문 앞 여분 공간 헬멧 박스 내부" },
+      { id: 39, name: "고무장갑", zone: "B-1", slotId: "B-1-space", tags: ["주방용품", "청소", "헬멧박스"], desc: "B-1 창문 앞 여분 공간 헬멧 박스 내부" },
+      { id: 40, name: "정수기 필터", zone: "B-1", slotId: "B-1-space", tags: ["주방", "필터", "헬멧박스"], desc: "B-1 창문 앞 여분 공간 헬멧 박스 내부" },
+      { id: 41, name: "건조 완료 그릇 및 주방용품", zone: "B-1", slotId: "B-1-space", tags: ["주방식기", "그릇", "지퍼박스"], desc: "B-1 창문 앞 여분 공간 지퍼 박스 내부" },
+      { id: 42, name: "헤어드라이기", zone: "B-2", slotId: "B-2-1", tags: ["욕실가전", "미용", "전자기기"], desc: "메탈 선반 1층 선반 위" },
+      { id: 43, name: "냄비 받침", zone: "B-2", slotId: "B-2-1", tags: ["주방용품", "받침대"], desc: "메탈 선반 1층 선반 위" },
+      { id: 44, name: "락앤락 통", zone: "B-2", slotId: "B-2-1", tags: ["주방용품", "밀폐용기"], desc: "메탈 선반 1층 선반 위" },
+      { id: 45, name: "지도표 성경재래김 (9개)", zone: "B-2", slotId: "B-2-1-box", tags: ["식품", "김", "식료품"], desc: "메탈 선반 1층 수납박스 내부" },
+      { id: 46, name: "쓱쓱싹싹 밥도둑 오징어채볶음 (2개)", zone: "B-2", slotId: "B-2-1-box", tags: ["식품", "반찬", "식료품"], desc: "메탈 선반 1층 수납박스 내부" },
+      { id: 47, name: "한식간장 감자반 (1개)", zone: "B-2", slotId: "B-2-1-box", tags: ["식품", "반찬", "식료품"], desc: "메탈 선반 1층 수납박스 내부" },
+      { id: 48, name: "구두", zone: "B-2", slotId: "B-2-1", tags: ["신발", "구두", "의류잡화"], desc: "메탈 선반 1층 선반 아래 바닥 공간" },
+      { id: 49, name: "여분의 비닐봉지", zone: "B-2", slotId: "B-2-2", tags: ["소모품", "비닐봉지", "주방소품"], desc: "메탈 선반 2층 선반 위" },
+      { id: 50, name: "Canon 카메라 & 카메라 가방", zone: "B-2", slotId: "B-2-2", tags: ["전자기기", "카메라", "촬영"], desc: "메탈 선반 2층 선반 위" },
+      { id: 51, name: "BOOIE 카메라", zone: "B-2", slotId: "B-2-2", tags: ["전자기기", "카메라", "촬영"], desc: "메탈 선반 2층 선반 위" },
+      { id: 52, name: "삼각대 & 셀카봉", zone: "B-2", slotId: "B-2-2", tags: ["촬영장비", "삼각대", "전자기기"], desc: "메탈 선반 2층 선반 위" },
+      { id: 53, name: "Uppsala 대학교 에코백", zone: "B-2", slotId: "B-2-2", tags: ["가방", "에코백"], desc: "메탈 선반 2층 측면 걸이" },
+      { id: 54, name: "Kalmar Nation 에코백", zone: "B-2", slotId: "B-2-2", tags: ["가방", "에코백"], desc: "메탈 선반 2층 측면 걸이" },
+      { id: 55, name: "후라이팬", zone: "B-2", slotId: "B-2-2", tags: ["조리도구", "후라이팬", "주방"], desc: "메탈 선반 2층 측면 걸이" },
+      { id: 56, name: "냄비", zone: "B-2", slotId: "B-2-2", tags: ["조리도구", "냄비", "주방"], desc: "메탈 선반 2층 측면 걸이" },
+      { id: 57, name: "오뚜기 국 블럭 세트 (미역국 8, 간편버섯해장국 9, 사골우거지국 6, 북엇국 3)", zone: "B-2", slotId: "B-2-2-R", tags: ["식품", "즉석국", "간편식"], desc: "메탈 선반 2층 우측 수납박스 내부" },
+      { id: 58, name: "백설 소면 국수 (1개)", zone: "B-2", slotId: "B-2-2-R", tags: ["식품", "면류", "국수"], desc: "메탈 선반 2층 우측 수납박스 내부" },
+      { id: 59, name: "백설 햇자른당면 (1개)", zone: "B-2", slotId: "B-2-2-R", tags: ["식품", "면류", "당면"], desc: "메탈 선반 2층 우측 수납박스 내부" },
+      { id: 60, name: "청정원 짬뽕밥양념 (1개)", zone: "B-2", slotId: "B-2-2-R", tags: ["식품", "양념", "소스"], desc: "메탈 선반 2층 우측 수납박스 내부" },
+      { id: 61, name: "백설 밥이랑야채 (1개)", zone: "B-2", slotId: "B-2-2-R", tags: ["식품", "양념", "후리가케"], desc: "메탈 선반 2층 우측 수납박스 내부" },
+      { id: 62, name: "청정원 밥엔야채 (2개)", zone: "B-2", slotId: "B-2-2-R", tags: ["식품", "양념", "후리가케"], desc: "메탈 선반 2층 우측 수납박스 내부" },
+      { id: 63, name: "샘표 안동찜닭양념 (1개)", zone: "B-2", slotId: "B-2-2-R", tags: ["식품", "양념", "소스"], desc: "메탈 선반 2층 우측 수납박스 내부" },
+      { id: 64, name: "오늘밥상 닭볶음탕 양념 (1개)", zone: "B-2", slotId: "B-2-2-R", tags: ["식품", "양념", "소스"], desc: "메탈 선반 2층 우측 수납박스 내부" },
+      { id: 65, name: "한식육수 양념 (8개)", zone: "B-2", slotId: "B-2-2-R", tags: ["식품", "양념", "육수"], desc: "메탈 선반 2층 우측 수납박스 내부" },
+      { id: 66, name: "양념쌈장 (2개)", zone: "B-2", slotId: "B-2-2-R", tags: ["식품", "장류", "쌈장"], desc: "메탈 선반 2층 우측 수납박스 내부" },
+      { id: 67, name: "매직대파", zone: "B-2", slotId: "B-2-2-R", tags: ["식품", "건채소", "조미료"], desc: "메탈 선반 2층 우측 수납박스 내부" },
+      { id: 68, name: "백설 육수에는 1분링", zone: "B-2", slotId: "B-2-2-R", tags: ["식품", "육수", "조미료"], desc: "메탈 선반 2층 우측 수납박스 내부" },
+      { id: 69, name: "순창 쇠고기볶음고추장 (6개)", zone: "B-2", slotId: "B-2-2-R", tags: ["식품", "장류", "고추장"], desc: "메탈 선반 2층 우측 수납박스 내부" },
+      { id: 70, name: "순창 볶음고추장 (5개)", zone: "B-2", slotId: "B-2-2-R", tags: ["식품", "장류", "고추장"], desc: "메탈 선반 2층 우측 수납박스 내부" },
+      { id: 71, name: "오뚜기 비밀크림컵스프 (3개)", zone: "B-2", slotId: "B-2-2-L", tags: ["식품", "스프", "간편식"], desc: "메탈 선반 2층 좌측 수납박스 내부" },
+      { id: 72, name: "어묵국물 한 잔 (19개)", zone: "B-2", slotId: "B-2-2-L", tags: ["식품", "티백", "국물"], desc: "메탈 선반 2층 좌측 수납박스 내부" },
+      { id: 73, name: "진라면 스틱 (19개)", zone: "B-2", slotId: "B-2-2-L", tags: ["식품", "라면스프", "조미료"], desc: "메탈 선반 2층 좌측 수납박스 내부" },
+      { id: 74, name: "누룽지 (7개)", zone: "B-2", slotId: "B-2-2-L", tags: ["식품", "누룽지", "간편식"], desc: "메탈 선반 2층 좌측 수납박스 내부" },
+      { id: 75, name: "햇반 (2개)", zone: "B-2", slotId: "B-2-2-L", tags: ["식품", "즉석밥", "간편식"], desc: "메탈 선반 2층 좌측 수납박스 내부" },
+      { id: 76, name: "광천김 (1개)", zone: "B-2", slotId: "B-2-2-L", tags: ["식품", "김", "반찬"], desc: "메탈 선반 2층 좌측 수납박스 내부" },
+      { id: 77, name: "오뚜기 카레면 (2개)", zone: "B-2", slotId: "B-2-2-L", tags: ["식품", "라면", "간편식"], desc: "메탈 선반 2층 좌측 수납박스 내부" },
+      { id: 78, name: "팔도비빔면 (2개)", zone: "B-2", slotId: "B-2-2-L", tags: ["식품", "라면", "간편식"], desc: "메탈 선반 2층 좌측 수납박스 내부" },
+      { id: 79, name: "라볶이 (1개)", zone: "B-2", slotId: "B-2-2-L", tags: ["식품", "라면", "간편식"], desc: "메탈 선반 2층 좌측 수납박스 내부" },
+      { id: 80, name: "까르보불닭 (1개)", zone: "B-2", slotId: "B-2-2-L", tags: ["식품", "라면", "간편식"], desc: "메탈 선반 2층 좌측 수납박스 내부" },
+      { id: 81, name: "감자면 (1개)", zone: "B-2", slotId: "B-2-2-L", tags: ["식품", "라면", "간편식"], desc: "메탈 선반 2층 좌측 수납박스 내부" },
+      { id: 82, name: "진라면 매운맛 (1개)", zone: "B-2", slotId: "B-2-2-L", tags: ["식품", "라면", "간편식"], desc: "메탈 선반 2층 좌측 수납박스 내부" },
+      { id: 83, name: "식기건조대", zone: "B-2", slotId: "B-2-3", tags: ["주방용품", "건조대", "식기"], desc: "메탈 선반 3층 선반 위" },
+      { id: 84, name: "주방용 칼 (날카로운 것)", zone: "B-2", slotId: "B-2-3", tags: ["조리도구", "칼", "주방"], desc: "메탈 선반 3층 선반 위" },
+      { id: 85, name: "쟁반", zone: "B-2", slotId: "B-2-3", tags: ["주방식기", "트레이", "쟁반"], desc: "메탈 선반 3층 선반 위" },
+      { id: 86, name: "수저 세트 (2개)", zone: "B-2", slotId: "B-2-3", tags: ["수저", "식기", "주방"], desc: "메탈 선반 3층 선반 위" },
+      { id: 87, name: "나무젓가락", zone: "B-2", slotId: "B-2-3", tags: ["수저", "식기", "주방"], desc: "메탈 선반 3층 선반 위" },
+      { id: 88, name: "다목적 칼 (덜 날카로운 것)", zone: "B-2", slotId: "B-2-3", tags: ["조리도구", "칼", "주방"], desc: "메탈 선반 3층 선반 위" },
+      { id: 89, name: "플라스틱 칼", zone: "B-2", slotId: "B-2-3", tags: ["조리도구", "일회용품", "주방"], desc: "메탈 선반 3층 선반 위" },
+      { id: 90, name: "수세미 & 그물 수세미", zone: "B-2", slotId: "B-2-3", tags: ["주방청소", "수세미", "세척용품"], desc: "메탈 선반 3층 선반 위" },
+      { id: 91, name: "Smash (1개)", zone: "B-2", slotId: "B-2-3", tags: ["간식", "과자", "초콜릿"], desc: "메탈 선반 3층 간식 공간" },
+      { id: 92, name: "초콜릿 (2개)", zone: "B-2", slotId: "B-2-3", tags: ["간식", "초콜릿"], desc: "메탈 선반 3층 간식 공간" },
+      { id: 93, name: "전자레인지 팝콘 (1개)", zone: "B-2", slotId: "B-2-3", tags: ["간식", "팝콘"], desc: "메탈 선반 3층 간식 공간" },
+      { id: 94, name: "감자칩 (1개)", zone: "B-2", slotId: "B-2-3", tags: ["간식", "과자", "감자칩"], desc: "메탈 선반 3층 간식 공간" },
+      { id: 95, name: "포카리 가루 (2개)", zone: "B-2", slotId: "B-2-3", tags: ["음료", "이온음료", "간식"], desc: "메탈 선반 3층 간식 공간" },
+      { id: 96, name: "단백질 초코바 (1개)", zone: "B-2", slotId: "B-2-3", tags: ["간식", "프로틴바", "초코바"], desc: "메탈 선반 3층 간식 공간" },
+      { id: 97, name: "박하사탕", zone: "B-2", slotId: "B-2-3", tags: ["간식", "사탕"], desc: "메탈 선반 3층 간식 공간" },
+      { id: 98, name: "견과류 Nutbag (1개)", zone: "B-2", slotId: "B-2-3", tags: ["간식", "견과류"], desc: "메탈 선반 3층 간식 공간" },
+      { id: 99, name: "에코백 (39비)", zone: "B-2", slotId: "B-2-3", tags: ["가방", "에코백"], desc: "메탈 선반 3층 측면 걸이" },
+      { id: 100, name: "거울", zone: "B-2", slotId: "B-2-4", tags: ["소품", "거울", "미용"], desc: "메탈 선반 4층 선반 위" },
+      { id: 101, name: "빗", zone: "B-2", slotId: "B-2-4", tags: ["소품", "헤어", "미용"], desc: "메탈 선반 4층 선반 위" },
+      { id: 102, name: "그루밍토닉", zone: "B-2", slotId: "B-2-4", tags: ["헤어", "스타일링", "미용"], desc: "메탈 선반 4층 선반 위" },
+      { id: 103, name: "꽃 (인테리어/화병)", zone: "B-2", slotId: "B-2-4", tags: ["인테리어", "소품", "꽃"], desc: "메탈 선반 4층 선반 위" },
+      { id: 104, name: "긴 비닐", zone: "B-2", slotId: "B-2-4", tags: ["소모품", "비닐"], desc: "메탈 선반 4층 선반 위" },
+      { id: 105, name: "텀블러 (3개, 보온용 포함)", zone: "B-2", slotId: "B-2-4", tags: ["주방", "텀블러", "보온병"], desc: "메탈 선반 4층 선반 위" },
+      { id: 106, name: "커피컵 (2개)", zone: "B-2", slotId: "B-2-4", tags: ["주방식기", "머그컵", "커피컵"], desc: "메탈 선반 4층 선반 위" },
+      { id: 107, name: "맥심 커피믹스 (5개)", zone: "B-2", slotId: "B-2-4", tags: ["식품", "커피", "간식"], desc: "메탈 선반 4층 선반 위" },
+      { id: 108, name: "티백 (2개)", zone: "B-2", slotId: "B-2-4", tags: ["식품", "차", "티백"], desc: "메탈 선반 4층 선반 위" },
+      { id: 109, name: "도서관 보관 가방 (2개)", zone: "B-2", slotId: "B-2-4", tags: ["가방", "보관가방"], desc: "메탈 선반 4층 측면 걸이" },
+      { id: 110, name: "텀블러용 세척 수세미", zone: "B-2", slotId: "B-2-4", tags: ["주방청소", "수세미", "세척솔"], desc: "메탈 선반 4층 측면 걸이" },
+      { id: 111, name: "여행용 멀티탭 (어댑터 기능)", zone: "B-2", slotId: "B-2-5", tags: ["전자기기", "멀티탭", "여행용품"], desc: "메탈 선반 5층 선반 위" },
+      { id: 112, name: "멀티탭", zone: "B-2", slotId: "B-2-5", tags: ["전자기기", "멀티탭", "케이블"], desc: "메탈 선반 5층 선반 위" },
+      { id: 113, name: "담요", zone: "B-2", slotId: "B-2-5", tags: ["침구", "패브릭", "담요"], desc: "메탈 선반 5층 선반 위" },
+      { id: 114, name: "키친타올 (2개)", zone: "B-2", slotId: "B-2-5", tags: ["생필품", "키친타올", "주방소모품"], desc: "메탈 선반 5층 선반 위" },
+      { id: 115, name: "화장실 휴지 (21개)", zone: "B-2", slotId: "B-2-5", tags: ["생필품", "휴지", "욕실소모품"], desc: "메탈 선반 5층 선반 위" },
+      { id: 116, name: "향수", zone: "C-1", slotId: "C-1-4", tags: ["향수", "화장품", "소품"], desc: "원목 책장 4층 선반" },
+      { id: 117, name: "장바구니", zone: "C-1", slotId: "C-1-4", tags: ["가방", "장바구니"], desc: "원목 책장 4층 선반" },
+      { id: 118, name: "현무암 팔찌", zone: "C-1", slotId: "C-1-4", tags: ["액세서리", "팔찌"], desc: "원목 책장 4층 선반" },
+      { id: 119, name: "껌", zone: "C-1", slotId: "C-1-4", tags: ["간식", "껌"], desc: "원목 책장 4층 선반" },
+      { id: 120, name: "손톱깎이 세트", zone: "C-1", slotId: "C-1-4", tags: ["위생", "손톱깎이", "미용"], desc: "원목 책장 4층 선반" },
+      { id: 121, name: "추가 간식 보관 구역", zone: "C-1", slotId: "C-1-4", tags: ["간식", "식품", "보관"], desc: "원목 책장 4층 (메탈 선반 3층과 연계)" },
+      { id: 122, name: "메모지 및 포스트잇", zone: "C-1", slotId: "C-1-3", tags: ["문구", "메모지", "포스트잇"], desc: "원목 책장 3층 선반" },
+      { id: 123, name: "스카치테이프", zone: "C-1", slotId: "C-1-3", tags: ["문구", "테이프"], desc: "원목 책장 3층 선반" },
+      { id: 124, name: "스테이플러", zone: "C-1", slotId: "C-1-3", tags: ["문구", "스테이플러"], desc: "원목 책장 3층 선반" },
+      { id: 125, name: "가위", zone: "C-1", slotId: "C-1-3", tags: ["문구", "가위"], desc: "원목 책장 3층 선반" },
+      { id: 126, name: "화이트 (수정테이프)", zone: "C-1", slotId: "C-1-3", tags: ["문구", "수정테이프"], desc: "원목 책장 3층 선반" },
+      { id: 127, name: "대형 필통 (칼 및 각종 필기구 포함)", zone: "C-1", slotId: "C-1-3", tags: ["문구", "필통", "필기구"], desc: "원목 책장 3층 선반" },
+      { id: 128, name: "여분 핸드폰 케이스", zone: "C-1", slotId: "C-1-3", tags: ["전자기기", "스마트폰", "케이스"], desc: "원목 책장 3층 선반" },
+      { id: 129, name: "여분 핸드폰 액정보호필름", zone: "C-1", slotId: "C-1-3", tags: ["전자기기", "스마트폰", "보호필름"], desc: "원목 책장 3층 선반" },
+      { id: 130, name: "외장하드", zone: "C-1", slotId: "C-1-3", tags: ["전자기기", "외장하드", "저장장치"], desc: "원목 책장 3층 선반" },
+      { id: 131, name: "여분 짧은 C-to-C 케이블", zone: "C-1", slotId: "C-1-3", tags: ["전자기기", "케이블", "충전선"], desc: "원목 책장 3층 선반" },
+      { id: 132, name: "블루투스 키보드", zone: "C-1", slotId: "C-1-3", tags: ["전자기기", "키보드", "주변기기"], desc: "원목 책장 3층 선반" },
+      { id: 133, name: "스마트워치 스트랩", zone: "C-1", slotId: "C-1-3", tags: ["웨어러블", "스트랩", "액세서리"], desc: "원목 책장 3층 선반" },
+      { id: 134, name: "배터리", zone: "C-1", slotId: "C-1-3", tags: ["전자기기", "배터리", "건전지"], desc: "원목 책장 3층 선반" },
+      { id: 135, name: "스페어 스마트폰", zone: "C-1", slotId: "C-1-3", tags: ["전자기기", "스마트폰", "공기계"], desc: "원목 책장 3층 선반" },
+      { id: 136, name: "여분 안경집 및 안경닦이", zone: "C-1", slotId: "C-1-3", tags: ["안경", "안경집", "소품"], desc: "원목 책장 3층 선반" },
+      { id: 137, name: "선글라스", zone: "C-1", slotId: "C-1-3", tags: ["패션잡화", "선글라스", "아이웨어"], desc: "원목 책장 3층 선반" },
+      { id: 138, name: "물티슈", zone: "C-1", slotId: "C-1-2", tags: ["생필품", "물티슈", "위생"], desc: "원목 책장 2층 선반" },
+      { id: 139, name: "휴지", zone: "C-1", slotId: "C-1-2", tags: ["생필품", "휴지", "위생"], desc: "원목 책장 2층 선반" },
+      { id: 140, name: "캡슐 세탁세제", zone: "C-1", slotId: "C-1-2", tags: ["세탁", "세제", "생필품"], desc: "원목 책장 2층 선반" },
+      { id: 141, name: "여행용 라이트 비상 알림 키링", zone: "C-1", slotId: "C-1-2", tags: ["여행용품", "호신용품", "키링"], desc: "원목 책장 2층 선반" },
+      { id: 142, name: "휴대폰 스트랩", zone: "C-1", slotId: "C-1-2", tags: ["액세서리", "스마트폰", "스트랩"], desc: "원목 책장 2층 선반" },
+      { id: 143, name: "안대", zone: "C-1", slotId: "C-1-2", tags: ["수면", "안대", "여행용품"], desc: "원목 책장 2층 선반" },
+      { id: 144, name: "귀마개", zone: "C-1", slotId: "C-1-2", tags: ["수면", "귀마개", "위생"], desc: "원목 책장 2층 선반" },
+      { id: 145, name: "어댑터", zone: "C-1", slotId: "C-1-2", tags: ["전자기기", "어댑터", "충전기"], desc: "원목 책장 2층 선반" },
+      { id: 146, name: "충전기 전선", zone: "C-1", slotId: "C-1-2", tags: ["전자기기", "케이블", "충전선"], desc: "원목 책장 2층 선반" },
+      { id: 147, name: "자물쇠", zone: "C-1", slotId: "C-1-1", tags: ["보안", "자물쇠", "여행용품"], desc: "원목 책장 1층 최하단 선반" },
+      { id: 148, name: "소분용 화장품 공병", zone: "C-1", slotId: "C-1-1", tags: ["화장품", "공병", "여행용품"], desc: "원목 책장 1층 최하단 선반" },
+      { id: 149, name: "피부용 마스크팩", zone: "C-1", slotId: "C-1-1", tags: ["스킨케어", "마스크팩", "화장품"], desc: "원목 책장 1층 최하단 선반" },
+      { id: 150, name: "캐리어 방향제", zone: "C-1", slotId: "C-1-1", tags: ["방향제", "탈취", "여행용품"], desc: "원목 책장 1층 최하단 선반" },
+      { id: 151, name: "먼지 롤러 (돌돌이)", zone: "C-1", slotId: "C-1-1", tags: ["청소", "롤러", "생활용품"], desc: "원목 책장 1층 최하단 선반" },
+      { id: 152, name: "SIM 카드 추출 핀", zone: "C-1", slotId: "C-1-1", tags: ["전자기기", "유심핀", "스마트폰"], desc: "원목 책장 1층 최하단 선반" },
+      { id: 153, name: "수하물 무게측정기", zone: "C-1", slotId: "C-1-1", tags: ["여행용품", "저울", "무게측정기"], desc: "원목 책장 1층 최하단 선반" },
+      { id: 154, name: "여행용 파우치 (2개)", zone: "C-1", slotId: "C-1-1", tags: ["수납", "파우치", "여행용품"], desc: "원목 책장 1층 최하단 선반" },
+      { id: 155, name: "여행용 소용량 화장품", zone: "C-1", slotId: "C-1-1", tags: ["화장품", "어메니티", "여행용품"], desc: "원목 책장 1층 최하단 선반" },
+      { id: 156, name: "열쇠 목걸이 스트랩", zone: "C-1", slotId: "C-1-1", tags: ["액세서리", "스트랩", "열쇠"], desc: "원목 책장 1층 최하단 선반" },
+      { id: 157, name: "체온계", zone: "C-1", slotId: "C-1-1", tags: ["의료용품", "체온계", "상비약"], desc: "원목 책장 1층 최하단 선반" },
+      { id: 158, name: "상비약 모음", zone: "C-1", slotId: "C-1-1", tags: ["의약품", "상비약", "건강"], desc: "원목 책장 1층 최하단 선반" },
+      { id: 159, name: "대일밴드", zone: "C-1", slotId: "C-1-1", tags: ["의약품", "밴드", "구급용품"], desc: "원목 책장 1층 최하단 선반" },
+      { id: 160, name: "면봉", zone: "C-1", slotId: "C-1-1", tags: ["위생", "면봉", "생필품"], desc: "원목 책장 1층 최하단 선반" },
+      { id: 161, name: "유로화 현금", zone: "C-2", slotId: "C-2-carrier", tags: ["외화", "현금", "귀중품"], desc: "구석 캐리어 내부" },
+      { id: 162, name: "여분 신용/체크카드", zone: "C-2", slotId: "C-2-carrier", tags: ["금융", "카드", "귀중품"], desc: "구석 캐리어 내부" },
+      { id: 163, name: "동전지갑", zone: "C-2", slotId: "C-2-carrier", tags: ["지갑", "외출용품"], desc: "구석 캐리어 내부" },
+      { id: 164, name: "증명사진", zone: "C-2", slotId: "C-2-carrier", tags: ["사진", "서류", "중요문서"], desc: "구석 캐리어 내부" },
+      { id: 165, name: "우천시 자전거 방수 커버", zone: "C-2", slotId: "C-2-carrier", tags: ["자전거", "방수커버", "보관용품"], desc: "구석 캐리어 내부" },
+      { id: 166, name: "외투 및 겨울 패딩, 후드집업", zone: "D-1", slotId: "D-1-hanger", tags: ["옷", "패딩", "행거"], desc: "옷장 좌측 메인 행거" },
+      { id: 167, name: "계절 모자 및 가방", zone: "D-1", slotId: "D-1-top", tags: ["모자", "가방"], desc: "옷장 좌측 상단 선반" },
+      { id: 168, name: "접은 의류 및 보관 비닐팩", zone: "D-1", slotId: "D-1-shelf1", tags: ["의류", "보관"], desc: "옷장 좌측 하단 선반 1단" },
+      { id: 169, name: "개어둔 티셔츠 & 청바지", zone: "D-2", slotId: "D-2-T1-b1", tags: ["의류", "청바지"], desc: "우측장 1열 와이어 바구니 1호" },
+      { id: 170, name: "양말 및 속옷, 이너웨어", zone: "D-2", slotId: "D-2-T1-b2", tags: ["의류", "속옷", "양말"], desc: "우측장 1열 와이어 바구니 2호" },
+      { id: 171, name: "세탁 바구니 & 잡화", zone: "D-2", slotId: "D-2-T1-bot", tags: ["세탁", "바구니"], desc: "우측장 1열 하단 바구니" },
+      { id: 172, name: "쇼핑백 & 보관 짐", zone: "D-2", slotId: "D-2-T2-bot", tags: ["쇼핑백", "짐"], desc: "우측장 2열 바닥 공간" },
+      { id: 173, name: "여분 세면도구 & 샴푸 리필", zone: "E-1", slotId: "E-1-mirror-top", tags: ["욕실", "샴푸"], desc: "거울 수납장 1단 (상단)" },
+      { id: 174, name: "스킨, 로션, 선크림", zone: "E-1", slotId: "E-1-mirror-mid", tags: ["화장품", "스킨케어"], desc: "거울 수납장 2단 (중단)" },
+      { id: 175, name: "칫솔, 치약, 면도기", zone: "E-1", slotId: "E-1-mirror-bot", tags: ["욕실", "세면도구", "위생"], desc: "거울 수납장 3단 (하단)" },
+      { id: 176, name: "핸드워시 & 비누", zone: "E-1", slotId: "E-1-sink", tags: ["세면대", "핸드워시"], desc: "세면대 주변 트레이" }
     ];
 
-    const STORAGE_KEY = 'room_inventory_items_v10_a1_pen';
+    const STORAGE_KEY = 'room_inventory_items_v20_full';
 
     function loadItems() {
       try {
@@ -474,25 +594,37 @@
           if (Array.isArray(parsed) && parsed.length > 0) return parsed;
         }
 
-        // 이전 버전 로컬 스토리지 마이그레이션 (A-1, A-2 최신 데이터 반영 + 타 구역 데이터 보존)
+        // 이전 버전에서 사용자가 직접 추가한 커스텀 아이템(id > 1000000000000) 보존
         const oldKey = Object.keys(localStorage).find(k => k.startsWith('room_inventory_items_'));
         if (oldKey) {
           const oldStored = localStorage.getItem(oldKey);
           if (oldStored) {
             const parsedOld = JSON.parse(oldStored);
             if (Array.isArray(parsedOld)) {
-              const otherItems = parsedOld.filter(i => i.zone !== 'A-1' && i.zone !== 'A-2');
-              const a1a2New = INITIAL_ITEMS.filter(i => i.zone === 'A-1' || i.zone === 'A-2');
-              const merged = [...a1a2New, ...otherItems];
-              saveItems(merged);
-              return merged;
+              const userCustomItems = parsedOld.filter(i => i.id > 1000000000000);
+              if (userCustomItems.length > 0) {
+                const merged = [...INITIAL_ITEMS, ...userCustomItems];
+                saveItems(merged);
+                return merged;
+              }
             }
           }
         }
       } catch (e) {
         console.warn("로컬 저장소 로드 실패", e);
       }
+      saveItems(INITIAL_ITEMS);
       return [...INITIAL_ITEMS];
+    }
+
+    function resetDataToDefault() {
+      if (confirm('저장된 데이터를 초기 상태(176개 정리 물품)로 복원하시겠습니까?\n새로 등록했던 사용자 추가 아이템은 초기화됩니다.')) {
+        items = [...INITIAL_ITEMS];
+        saveItems(items);
+        updateCounts();
+        resetFilter();
+        alert('176개 정리 아이템 기본값으로 초기화되었습니다.');
+      }
     }
 
     function saveItems(list) {
@@ -503,7 +635,7 @@
       }
     }
 
-    let items = loadItems();
+        let items = loadItems();
     let currentZone = null;
     let currentSlot = null;
 
